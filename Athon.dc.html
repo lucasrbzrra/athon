@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{font-family:Inter,system-ui,sans-serif;}
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-thumb{background:#cdd5e6;border-radius:9999px;border:2px solid transparent;background-clip:padding-box;}
+@keyframes athPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(.8);}}
+@keyframes athPop{0%{transform:scale(.4);opacity:0;}60%{transform:scale(1.12);}100%{transform:scale(1);opacity:1;}}
+@keyframes athUp{from{transform:translateY(14px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes athFade{from{opacity:0;}to{opacity:1;}}
+@keyframes athToast{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes athDraw{from{stroke-dashoffset:400;}to{stroke-dashoffset:0;}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#F4F6FB;color:#0D1117;font-family:Inter,sans-serif;display:flex;">
+
+<!-- ===================== SIDEBAR ===================== -->
+<sc-if value="{{ showSidebar }}" hint-placeholder-val="{{ false }}">
+<aside style="width:{{ sbWidth }};flex-shrink:0;background:#fff;border-right:1px solid #E8ECF4;position:sticky;top:0;height:100vh;align-self:flex-start;display:flex;flex-direction:column;padding:{{ sbPad }};transition:width .18s ease;overflow:hidden;">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:18px;">
+    <sc-if value="{{ notCollapsed }}" hint-placeholder-val="{{ true }}">
+      <div onClick="{{ goSidebarHome }}" style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:6px 8px;overflow:hidden;">
+        <svg width="26" height="26" viewBox="0 0 24 24" style="flex-shrink:0;"><circle cx="12" cy="12" r="2.3" fill="#1B4DFF"></circle><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4"></ellipse><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4" transform="rotate(60 12 12)"></ellipse><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4" transform="rotate(120 12 12)"></ellipse></svg>
+        <span style="font:700 21px Inter;letter-spacing:-.5px;color:#0A1F6E;white-space:nowrap;">Athon</span>
+        <sc-if value="{{ consultorArea }}" hint-placeholder-val="{{ false }}"><span style="font:600 10px Inter;letter-spacing:.4px;text-transform:uppercase;color:#1B4DFF;background:rgba(27,77,255,.1);padding:3px 7px;border-radius:5px;white-space:nowrap;">Consultor</span></sc-if>
+      </div>
+    </sc-if>
+    <button onClick="{{ toggleSidebar }}" title="Expandir ou recolher menu" style="width:36px;height:36px;flex-shrink:0;border:1px solid #E8ECF4;background:#fff;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4B5563;" style-hover="background:#F4F6FB;">{{ sbToggleIcon }}</button>
+  </div>
+  <div style="font:600 11px Inter;letter-spacing:.5px;text-transform:uppercase;color:#9CA3AF;padding:0 10px;margin-bottom:8px;display:{{ sbLabel }};">Navegação</div>
+  <nav style="display:flex;flex-direction:column;gap:3px;">
+    <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
+      <div onClick="{{ n.onClick }}" title="{{ n.label }}" style="display:flex;align-items:center;gap:12px;justify-content:{{ sbJustify }};padding:11px 12px;border-radius:10px;cursor:pointer;background:{{ n.bg }};color:{{ n.color }};font:{{ n.weight }} 14px Inter;transition:background .12s;white-space:nowrap;overflow:hidden;">{{ n.iconEl }}<span style="display:{{ sbLabel }};">{{ n.label }}</span></div>
+    </sc-for>
+  </nav>
+  <div style="height:1px;background:#E8ECF4;margin:14px 8px;"></div>
+  <div onClick="{{ goLanding }}" title="Página inicial" style="display:flex;align-items:center;gap:12px;justify-content:{{ sbJustify }};padding:11px 12px;border-radius:10px;cursor:pointer;color:#4B5563;font:500 14px Inter;white-space:nowrap;overflow:hidden;" style-hover="background:#F4F6FB;">{{ ic.home }}<span style="display:{{ sbLabel }};">Página inicial</span></div>
+  <div style="flex:1;"></div>
+  <div style="height:1px;background:#E8ECF4;margin:8px 8px 10px;"></div>
+  <sc-if value="{{ consultorArea }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ goCatalog }}" title="Ver como Empresa" style="display:flex;align-items:center;gap:12px;justify-content:{{ sbJustify }};padding:11px 12px;border-radius:10px;cursor:pointer;color:#4B5563;font:500 14px Inter;white-space:nowrap;overflow:hidden;" style-hover="background:#F4F6FB;">{{ ic.repeatsm }}<span style="display:{{ sbLabel }};">Ver como Empresa</span></div>
+  </sc-if>
+  <sc-if value="{{ notConsultorArea }}" hint-placeholder-val="{{ true }}">
+    <div onClick="{{ goConsultorPersona }}" title="Ver como Consultor" style="display:flex;align-items:center;gap:12px;justify-content:{{ sbJustify }};padding:11px 12px;border-radius:10px;cursor:pointer;color:#4B5563;font:500 14px Inter;white-space:nowrap;overflow:hidden;" style-hover="background:#F4F6FB;">{{ ic.repeatsm }}<span style="display:{{ sbLabel }};">Ver como Consultor</span></div>
+  </sc-if>
+  <div onClick="{{ goLogin }}" title="Sair" style="display:flex;align-items:center;gap:12px;justify-content:{{ sbJustify }};padding:11px 12px;border-radius:10px;cursor:pointer;color:#EF4444;font:500 14px Inter;white-space:nowrap;overflow:hidden;" style-hover="background:#FEF2F2;">{{ ic.logout }}<span style="display:{{ sbLabel }};">Sair</span></div>
+</aside>
+</sc-if>
+
+<!-- ===================== CONTENT COLUMN ===================== -->
+<div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:100vh;">
+
+<!-- ===================== APP TOPBAR (EMPRESA) ===================== -->
+<sc-if value="{{ showAppTopbar }}" hint-placeholder-val="{{ true }}">
+<header style="position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid #E8ECF4;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;">
+  <sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ doBack }}" style="display:flex;align-items:center;gap:7px;background:#F4F6FB;border:1px solid #E8ECF4;border-radius:9px;padding:8px 14px;font:600 13px Inter;color:#0A1F6E;cursor:pointer;" style-hover="background:#E8ECF4;">{{ ic.arrowleftdark }} Voltar</button>
+  </sc-if>
+  <sc-if value="{{ notCanBack }}" hint-placeholder-val="{{ true }}"><span></span></sc-if>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <sc-if value="{{ planActive }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:7px;background:rgba(16,185,129,.12);color:#10B981;border-radius:6px;padding:7px 13px;font:600 13px Inter;">{{ ic.shieldcheck }} Plano ativo</div>
+    </sc-if>
+    <sc-if value="{{ showCreditBadge }}" hint-placeholder-val="{{ true }}">
+      <div onClick="{{ goPlanos }}" style="display:flex;align-items:center;gap:8px;background:rgba(77,255,210,.18);border-radius:8px;padding:7px 14px;cursor:pointer;" title="Ver planos e créditos">
+        <span style="display:flex;color:#0A1F6E;">{{ ic.coins }}</span>
+        <span style="font:600 16px 'JetBrains Mono',monospace;color:{{ creditColor }};">{{ credits }}</span>
+        <span style="font:500 12px Inter;color:#0A1F6E;opacity:.7;">créditos</span>
+      </div>
+    </sc-if>
+    <div style="position:relative;">
+      <div onClick="{{ toggleMenu }}" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px;border-radius:9999px;">
+        <div style="width:36px;height:36px;border-radius:9999px;background:#0A1F6E;color:#fff;display:flex;align-items:center;justify-content:center;font:600 13px Inter;">MC</div>
+        <div style="text-align:left;line-height:1.2;">
+          <div style="font:600 13px Inter;color:#0D1117;">Marina Costa</div>
+          <div style="font:400 11px Inter;color:#4B5563;">{{ companyName }}</div>
+        </div>
+        <span style="display:flex;color:#9CA3AF;">{{ ic.chevrondown }}</span>
+      </div>
+      <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;right:0;top:52px;width:230px;background:#fff;border:1px solid #E8ECF4;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:6px;animation:athFade .12s ease;">
+          <div onClick="{{ goPlanos }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font:500 14px Inter;color:#0D1117;cursor:pointer;" style-hover="background:#F4F6FB;">{{ ic.wallet }} Créditos e planos</div>
+          <div onClick="{{ goConsultores }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font:500 14px Inter;color:#0D1117;cursor:pointer;" style-hover="background:#F4F6FB;">{{ ic.userscog }} Consultores vinculados</div>
+          <div style="height:1px;background:#E8ECF4;margin:6px 4px;"></div>
+          <div onClick="{{ goConsultorPersona }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font:500 14px Inter;color:#4B5563;cursor:pointer;" style-hover="background:#F4F6FB;">{{ ic.repeat }} Ver como Consultor</div>
+          <div onClick="{{ goLogin }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font:500 14px Inter;color:#EF4444;cursor:pointer;" style-hover="background:#FEF2F2;">{{ ic.logout }} Sair</div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</header>
+</sc-if>
+
+<!-- ===================== CONSULTOR TOPBAR ===================== -->
+<sc-if value="{{ showConsultorTopbar }}" hint-placeholder-val="{{ false }}">
+<header style="position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid #E8ECF4;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;">
+  <sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ doBack }}" style="display:flex;align-items:center;gap:7px;background:#F4F6FB;border:1px solid #E8ECF4;border-radius:9px;padding:8px 14px;font:600 13px Inter;color:#0A1F6E;cursor:pointer;" style-hover="background:#E8ECF4;">{{ ic.arrowleftdark }} Voltar</button>
+  </sc-if>
+  <sc-if value="{{ notCanBack }}" hint-placeholder-val="{{ true }}"><span></span></sc-if>
+  <div style="position:relative;">
+    <div onClick="{{ toggleMenu }}" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px;border-radius:9999px;">
+      <div style="width:36px;height:36px;border-radius:9999px;background:#1B4DFF;color:#fff;display:flex;align-items:center;justify-content:center;font:600 13px Inter;">RL</div>
+      <div style="text-align:left;line-height:1.2;">
+        <div style="font:600 13px Inter;color:#0D1117;">Rafael Lima</div>
+        <div style="font:400 11px Inter;color:#4B5563;">{{ consultancyName }}</div>
+      </div>
+      <span style="display:flex;color:#9CA3AF;">{{ ic.chevrondown }}</span>
+    </div>
+    <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;right:0;top:52px;width:210px;background:#fff;border:1px solid #E8ECF4;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:6px;animation:athFade .12s ease;">
+        <div onClick="{{ goCatalog }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font:500 14px Inter;color:#4B5563;cursor:pointer;" style-hover="background:#F4F6FB;">{{ ic.repeat }} Ver como Empresa</div>
+        <div onClick="{{ goLogin }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font:500 14px Inter;color:#EF4444;cursor:pointer;" style-hover="background:#FEF2F2;">{{ ic.logout }} Sair</div>
+      </div>
+    </sc-if>
+  </div>
+</header>
+</sc-if>
+
+<!-- ===================== CATÁLOGO DE TEMAS (PRINCIPAL) ===================== -->
+<sc-if value="{{ isCatalog }}" hint-placeholder-val="{{ true }}">
+<main style="max-width:1240px;margin:0 auto;padding:40px 28px 80px;">
+  <div style="margin-bottom:8px;font:700 36px Inter;letter-spacing:-.8px;">Temas de Benchmark</div>
+  <div style="font:400 16px Inter;color:#4B5563;margin-bottom:28px;max-width:620px;">Escolha um tema, contribua com seus dados e acesse o panorama real do mercado.</div>
+
+  <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:28px;">
+    <div style="flex:1;min-width:200px;background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:20px 22px;display:flex;align-items:center;gap:14px;">
+      <div style="width:42px;height:42px;border-radius:10px;background:rgba(27,77,255,.1);display:flex;align-items:center;justify-content:center;color:#1B4DFF;">{{ ic.layers }}</div>
+      <div><div style="font:700 24px 'JetBrains Mono',monospace;color:#0D1117;">22</div><div style="font:400 13px Inter;color:#4B5563;">temas disponíveis</div></div>
+    </div>
+    <div style="flex:1;min-width:200px;background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:20px 22px;display:flex;align-items:center;gap:14px;">
+      <div style="width:42px;height:42px;border-radius:10px;background:rgba(16,185,129,.12);display:flex;align-items:center;justify-content:center;color:#10B981;">{{ ic.check }}</div>
+      <div><div style="font:700 24px 'JetBrains Mono',monospace;color:#0D1117;">{{ answeredCount }}</div><div style="font:400 13px Inter;color:#4B5563;">respondidos por você</div></div>
+    </div>
+    <div style="flex:1;min-width:200px;background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:20px 22px;display:flex;align-items:center;gap:14px;">
+      <div style="width:42px;height:42px;border-radius:10px;background:rgba(10,31,110,.08);display:flex;align-items:center;justify-content:center;color:#0A1F6E;">{{ ic.building }}</div>
+      <div><div style="font:700 24px 'JetBrains Mono',monospace;color:#0D1117;">1.284</div><div style="font:400 13px Inter;color:#4B5563;">empresas no ecossistema</div></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px;">
+    <sc-for list="{{ categories }}" as="c" hint-placeholder-count="7">
+      <button onClick="{{ c.onClick }}" style="border-radius:9999px;border:1.5px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};padding:8px 16px;font:500 13px Inter;cursor:pointer;transition:all .12s;">{{ c.label }}</button>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;">
+    <sc-for list="{{ themes }}" as="t" hint-placeholder-count="9">
+      <div style="position:relative;background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);overflow:hidden;display:flex;flex-direction:column;transition:transform .15s,box-shadow .15s;" style-hover="box-shadow:0 4px 12px rgba(0,0,0,.1);transform:translateY(-2px);">
+        <div style="height:3px;background:#1B4DFF;"></div>
+        <div style="padding:22px 22px 18px;display:flex;flex-direction:column;flex:1;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+            <div style="width:44px;height:44px;border-radius:11px;background:rgba(27,77,255,.08);display:flex;align-items:center;justify-content:center;color:#1B4DFF;">{{ t.iconEl }}</div>
+            <sc-if value="{{ t.answered }}" hint-placeholder-val="{{ false }}">
+              <div style="width:26px;height:26px;border-radius:9999px;background:#10B981;color:#fff;display:flex;align-items:center;justify-content:center;">{{ ic.checksm }}</div>
+            </sc-if>
+          </div>
+          <div style="font:500 11px Inter;letter-spacing:.3px;text-transform:uppercase;color:#1B4DFF;margin-bottom:7px;">{{ t.category }}</div>
+          <div style="font:600 19px Inter;letter-spacing:-.3px;line-height:1.25;margin-bottom:8px;color:#0D1117;">{{ t.title }}</div>
+          <div style="font:400 14px Inter;color:#4B5563;line-height:1.45;margin-bottom:18px;flex:1;">{{ t.dataKey }}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <sc-if value="{{ t.answered }}" hint-placeholder-val="{{ false }}">
+              <span style="display:inline-flex;align-items:center;gap:5px;background:rgba(16,185,129,.12);color:#0a7a55;border-radius:6px;padding:4px 9px;font:600 12px Inter;">{{ ic.checksm }} Respondido</span>
+            </sc-if>
+            <sc-if value="{{ t.notAnswered }}" hint-placeholder-val="{{ true }}">
+              <span style="display:inline-flex;align-items:center;gap:5px;background:#E8ECF4;color:#4B5563;border-radius:6px;padding:4px 9px;font:600 12px Inter;">Não respondido</span>
+            </sc-if>
+            <span style="font:400 12px Inter;color:#9CA3AF;">{{ t.n }} empresas</span>
+          </div>
+          <sc-if value="{{ t.ctaResponder }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ t.onRespond }}" style="width:100%;background:transparent;color:#1B4DFF;border:1.5px solid #1B4DFF;border-radius:10px;padding:11px;font:600 13px Inter;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;" style-hover="background:rgba(27,77,255,.06);">{{ ic.pencil }} Responder · +5 créditos</button>
+          </sc-if>
+          <sc-if value="{{ t.ctaVerPrimary }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ t.onBenchmark }}" style="width:100%;background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:12px;font:600 13px Inter;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">{{ ic.barchart }} Ver benchmark · 3 créditos</button>
+          </sc-if>
+          <sc-if value="{{ t.ctaVerGhost }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ t.onBenchmark }}" style="width:100%;background:#F4F6FB;color:#0A1F6E;border:none;border-radius:10px;padding:12px;font:600 13px Inter;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;" style-hover="background:#E8ECF4;">{{ ic.barchart }} Ver benchmark</button>
+          </sc-if>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</main>
+</sc-if>
+
+<!-- ===================== FORMULÁRIO ===================== -->
+<sc-if value="{{ isForm }}" hint-placeholder-val="{{ false }}">
+<main style="max-width:680px;margin:0 auto;padding:34px 24px 40px;animation:athFade .2s ease;">
+  <sc-if value="{{ formCorp }}" hint-placeholder-val="{{ true }}">
+  <div onClick="{{ goCatalog }}" style="display:inline-flex;align-items:center;gap:6px;font:400 13px Inter;color:#4B5563;margin-bottom:18px;cursor:pointer;">Temas <span style="color:#9CA3AF;">/</span> <span style="color:#0D1117;font-weight:500;">Reembolso de Km</span></div>
+  </sc-if>
+  <sc-if value="{{ formPublic }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ goRespList }}" style="display:inline-flex;align-items:center;gap:6px;font:400 13px Inter;color:#4B5563;margin-bottom:18px;cursor:pointer;">{{ ic.arrowleft }} Formulários solicitados por Vértice RH</div>
+  </sc-if>
+  <div style="font:700 28px Inter;letter-spacing:-.5px;margin-bottom:16px;">Reembolso de Km</div>
+  <div style="background:#E8ECF4;border-radius:10px;padding:16px 18px;font:400 14px Inter;color:#4B5563;line-height:1.5;margin-bottom:22px;display:flex;gap:12px;">
+    <span style="color:#1B4DFF;flex-shrink:0;margin-top:1px;">{{ ic.info }}</span>
+    Coletamos como sua empresa reembolsa o uso de veículo próprio em deslocamentos. Leva ~5 minutos. Esses dados alimentam o benchmark de R$/km por setor, porte e região.
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <span style="font:600 13px Inter;color:#0D1117;">Grupo {{ formGroup }} de 3 — {{ groupTitle }}</span>
+    <span style="font:400 12px Inter;color:#9CA3AF;display:flex;align-items:center;gap:5px;">{{ ic.save }} Rascunho salvo</span>
+  </div>
+  <div style="height:6px;background:#E8ECF4;border-radius:9999px;overflow:hidden;margin-bottom:30px;">
+    <div style="height:100%;background:#1B4DFF;border-radius:9999px;width:{{ formProgress }};transition:width .3s;"></div>
+  </div>
+
+  <!-- GRUPO 1 -->
+  <sc-if value="{{ group1 }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;flex-direction:column;gap:24px;animation:athFade .2s;">
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;">
+      <div style="font:500 15px Inter;margin-bottom:14px;">A empresa reembolsa km rodado em veículo próprio?</div>
+      <div style="display:flex;gap:10px;">
+        <button onClick="{{ setReembolsaSim }}" style="flex:1;padding:12px;border-radius:10px;border:1.5px solid {{ reembolsaSimBorder }};background:{{ reembolsaSimBg }};color:{{ reembolsaSimColor }};font:600 14px Inter;cursor:pointer;">Sim</button>
+        <button onClick="{{ setReembolsaNao }}" style="flex:1;padding:12px;border-radius:10px;border:1.5px solid {{ reembolsaNaoBorder }};background:{{ reembolsaNaoBg }};color:{{ reembolsaNaoColor }};font:600 14px Inter;cursor:pointer;">Não</button>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;">
+      <div style="font:500 15px Inter;margin-bottom:14px;">Valor do reembolso por km rodado</div>
+      <div style="display:flex;align-items:center;border:1.5px solid #E8ECF4;border-radius:10px;overflow:hidden;">
+        <span style="padding:12px 14px;background:#F4F6FB;color:#4B5563;font:500 14px 'JetBrains Mono',monospace;border-right:1.5px solid #E8ECF4;">R$/km</span>
+        <input value="{{ form.valor }}" onChange="{{ onValor }}" style="flex:1;border:none;outline:none;padding:12px 14px;font:400 15px 'JetBrains Mono',monospace;color:#0D1117;" placeholder="1,20"/>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;">
+      <div style="font:500 15px Inter;margin-bottom:14px;">A política é igual para todos os níveis hierárquicos?</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <label onClick="{{ setNivelIgual }}" style="display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:10px;border:1.5px solid {{ nivelIgualBorder }};cursor:pointer;background:{{ nivelIgualBg }};">
+          <span style="width:18px;height:18px;border-radius:9999px;border:2px solid {{ nivelIgualDot }};display:flex;align-items:center;justify-content:center;"><span style="width:9px;height:9px;border-radius:9999px;background:{{ nivelIgualFill }};"></span></span>
+          <span style="font:400 14px Inter;color:#0D1117;">Sim, igual para todos</span>
+        </label>
+        <label onClick="{{ setNivelVaria }}" style="display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:10px;border:1.5px solid {{ nivelVariaBorder }};cursor:pointer;background:{{ nivelVariaBg }};">
+          <span style="width:18px;height:18px;border-radius:9999px;border:2px solid {{ nivelVariaDot }};display:flex;align-items:center;justify-content:center;"><span style="width:9px;height:9px;border-radius:9999px;background:{{ nivelVariaFill }};"></span></span>
+          <span style="font:400 14px Inter;color:#0D1117;">Não, varia por nível</span>
+        </label>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- GRUPO 2 -->
+  <sc-if value="{{ group2 }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;flex-direction:column;gap:24px;animation:athFade .2s;">
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;">
+      <div style="font:500 15px Inter;margin-bottom:14px;">Com que frequência o valor por km é reajustado?</div>
+      <select value="{{ form.freq }}" onChange="{{ onFreq }}" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;color:#0D1117;background:#fff;cursor:pointer;">
+        <option value="">Selecione…</option><option>Mensal</option><option>Trimestral</option><option>Semestral</option><option>Anual</option><option>Sem periodicidade definida</option>
+      </select>
+    </div>
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;">
+      <div style="font:500 15px Inter;margin-bottom:6px;">Qual o índice de reajuste utilizado?</div>
+      <div style="font:400 12px Inter;color:#9CA3AF;margin-bottom:14px;">Seleção múltipla</div>
+      <div style="display:flex;flex-wrap:wrap;gap:9px;">
+        <sc-for list="{{ indiceChips }}" as="ch" hint-placeholder-count="5">
+          <button onClick="{{ ch.onClick }}" style="border-radius:9999px;border:1.5px solid {{ ch.border }};background:{{ ch.bg }};color:{{ ch.color }};padding:9px 15px;font:500 13px Inter;cursor:pointer;">{{ ch.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;">
+      <div style="font:500 15px Inter;margin-bottom:6px;">% de reajuste aplicado no último ciclo <span style="color:#9CA3AF;font-weight:400;">(opcional)</span></div>
+      <div style="display:flex;align-items:center;border:1.5px solid #E8ECF4;border-radius:10px;overflow:hidden;margin-top:8px;">
+        <input value="{{ form.reajuste }}" onChange="{{ onReajuste }}" style="flex:1;border:none;outline:none;padding:12px 14px;font:400 15px 'JetBrains Mono',monospace;color:#0D1117;" placeholder="8"/>
+        <span style="padding:12px 14px;background:#F4F6FB;color:#4B5563;font:500 14px 'JetBrains Mono',monospace;border-left:1.5px solid #E8ECF4;">%</span>
+      </div>
+      <sc-if value="{{ reajusteWarn }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:10px;display:flex;align-items:center;gap:7px;font:400 13px Inter;color:#F59E0B;">{{ ic.warn }} Valor acima de 100% — confirme se está correto.</div>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- GRUPO 3 -->
+  <sc-if value="{{ group3 }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;flex-direction:column;gap:24px;animation:athFade .2s;">
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;display:flex;align-items:center;justify-content:space-between;">
+      <div style="font:500 15px Inter;">O reembolso inclui pedágio e estacionamento?</div>
+      <div onClick="{{ togglePedagio }}" style="width:48px;height:28px;border-radius:9999px;background:{{ pedagioBg }};position:relative;cursor:pointer;transition:background .15s;flex-shrink:0;">
+        <span style="position:absolute;top:3px;left:{{ pedagioPos }};width:22px;height:22px;border-radius:9999px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .15s;"></span>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;">
+      <div style="font:500 15px Inter;margin-bottom:6px;">Existe teto mensal de reembolso por colaborador? <span style="color:#9CA3AF;font-weight:400;">(opcional)</span></div>
+      <div style="display:flex;align-items:center;border:1.5px solid #E8ECF4;border-radius:10px;overflow:hidden;margin-top:8px;">
+        <span style="padding:12px 14px;background:#F4F6FB;color:#4B5563;font:500 14px 'JetBrains Mono',monospace;border-right:1.5px solid #E8ECF4;">R$</span>
+        <input value="{{ form.teto }}" onChange="{{ onTeto }}" style="flex:1;border:none;outline:none;padding:12px 14px;font:400 15px 'JetBrains Mono',monospace;color:#0D1117;" placeholder="1.500"/>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:14px;"><span style="font:500 15px Inter;">Nível de satisfação interna com a política</span><span style="font:600 15px 'JetBrains Mono',monospace;color:#1B4DFF;">{{ form.satisfacao }}%</span></div>
+      <input type="range" min="0" max="100" value="{{ form.satisfacao }}" onChange="{{ onSatisfacao }}" style="width:100%;accent-color:#1B4DFF;cursor:pointer;"/>
+    </div>
+  </div>
+  </sc-if>
+</main>
+
+<!-- form footer -->
+<div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #E8ECF4;padding:16px 24px;z-index:30;margin-top:auto;">
+  <div style="max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+    <sc-if value="{{ group1 }}" hint-placeholder-val="{{ true }}">
+      <sc-if value="{{ formCorp }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ confirmLeaveForm }}" style="background:none;border:none;color:#4B5563;font:600 13px Inter;cursor:pointer;">Voltar para Temas</button>
+      </sc-if>
+      <sc-if value="{{ formPublic }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ goRespList }}" style="background:none;border:none;color:#4B5563;font:600 13px Inter;cursor:pointer;">Voltar</button>
+      </sc-if>
+    </sc-if>
+    <sc-if value="{{ groupGt1 }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ prevGroup }}" style="background:none;border:1.5px solid #E8ECF4;color:#4B5563;font:600 13px Inter;cursor:pointer;border-radius:10px;padding:12px 20px;">Voltar</button>
+    </sc-if>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <sc-if value="{{ groupLt3 }}" hint-placeholder-val="{{ true }}">
+        <span style="font:400 12px Inter;color:#9CA3AF;">Seus dados são anonimizados antes de qualquer uso</span>
+        <button onClick="{{ nextGroup }}" style="background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:13px 26px;font:600 13px Inter;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">Avançar {{ ic.arrowright }}</button>
+      </sc-if>
+      <sc-if value="{{ group3 }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ formCorp }}" hint-placeholder-val="{{ true }}">
+          <span style="font:400 12px Inter;color:#9CA3AF;">Seus dados são anonimizados antes de qualquer uso</span>
+          <button onClick="{{ submitForm }}" style="background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:13px 26px;font:600 13px Inter;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">{{ ic.check }} Enviar e ganhar 5 créditos</button>
+        </sc-if>
+        <sc-if value="{{ formPublic }}" hint-placeholder-val="{{ false }}">
+          <span style="font:400 12px Inter;color:#9CA3AF;">Vinculado ao CNPJ 12.345.678/0001-90 · anonimizado</span>
+          <button onClick="{{ submitForm }}" style="background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:13px 26px;font:600 13px Inter;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">{{ ic.check }} Enviar resposta</button>
+        </sc-if>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ===================== SUCESSO ===================== -->
+<sc-if value="{{ isSucesso }}" hint-placeholder-val="{{ false }}">
+<main style="min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:40px 24px;">
+  <div style="background:#fff;border-radius:24px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:48px 40px;max-width:480px;width:100%;text-align:center;animation:athUp .3s ease;">
+    <div style="width:76px;height:76px;border-radius:9999px;background:rgba(16,185,129,.12);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;animation:athPop .4s ease;color:#10B981;">{{ ic.checkbig }}</div>
+    <div style="font:700 28px Inter;letter-spacing:-.5px;margin-bottom:10px;">Contribuição registrada!</div>
+    <div style="font:400 15px Inter;color:#4B5563;line-height:1.5;margin-bottom:26px;">Seus dados foram anonimizados e já estão enriquecendo o ecossistema Athon.</div>
+    <div style="background:rgba(77,255,210,.12);border:1px solid rgba(77,255,210,.5);border-radius:14px;padding:18px;margin-bottom:26px;display:flex;align-items:center;justify-content:center;gap:12px;">
+      <span style="display:flex;color:#0A1F6E;">{{ ic.coins }}</span>
+      <div style="text-align:left;"><div style="font:700 17px Inter;color:#0a7a55;">+5 créditos adicionados</div><div style="font:400 13px Inter;color:#0A1F6E;">Saldo atual: <strong style="font-family:'JetBrains Mono',monospace;">{{ credits }} créditos</strong></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <sc-if value="{{ canBenchmarkAfter }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ benchmarkFromSucesso }}" style="background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:14px;font:600 14px Inter;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">{{ ic.barchart }} Ver benchmark deste tema · 3 créditos</button>
+      </sc-if>
+      <sc-if value="{{ cantBenchmarkAfter }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ goPlanos }}" style="background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:14px;font:600 14px Inter;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">{{ ic.wallet }} Comprar créditos</button>
+      </sc-if>
+      <button onClick="{{ goCatalog }}" style="background:none;border:none;color:#4B5563;font:600 13px Inter;cursor:pointer;padding:8px;">Voltar ao catálogo de temas</button>
+    </div>
+  </div>
+</main>
+</sc-if>
+
+<!-- ===================== DASHBOARD ===================== -->
+<sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
+<main style="max-width:1080px;margin:0 auto;padding:34px 28px 80px;animation:athFade .2s ease;">
+  <div onClick="{{ goCatalog }}" style="display:inline-flex;align-items:center;gap:6px;font:400 13px Inter;color:#4B5563;margin-bottom:18px;cursor:pointer;">Temas <span style="color:#9CA3AF;">/</span> Reembolso de Km <span style="color:#9CA3AF;">/</span> <span style="color:#0D1117;font-weight:500;">Benchmark</span></div>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:26px;">
+    <div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+        <span style="font:700 28px Inter;letter-spacing:-.5px;">Reembolso de Km</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.12);color:#0a7a55;border-radius:9999px;padding:5px 12px;font:600 12px Inter;"><span style="width:8px;height:8px;border-radius:9999px;background:#10B981;animation:athPulse 1.6s infinite;"></span>Dados ao vivo</span>
+      </div>
+      <div style="font:400 13px Inter;color:#4B5563;">147 empresas participaram · Atualizado há 2 dias</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;background:#fff;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:16px 18px;align-items:center;">
+    <span style="display:flex;align-items:center;gap:7px;font:600 13px Inter;color:#0D1117;">{{ ic.sliders }} Filtros</span>
+    <select value="{{ dfSeg }}" onChange="{{ onDfSeg }}" style="border:1.5px solid #E8ECF4;border-radius:10px;padding:9px 12px;font:400 13px Inter;color:#0D1117;background:#fff;cursor:pointer;"><option>Todos</option><option>Tecnologia</option><option>Indústria</option><option>Varejo</option><option>Serviços</option><option>Saúde</option><option>Financeiro</option></select>
+    <select value="{{ dfPorte }}" onChange="{{ onDfPorte }}" style="border:1.5px solid #E8ECF4;border-radius:10px;padding:9px 12px;font:400 13px Inter;color:#0D1117;background:#fff;cursor:pointer;"><option>Todos</option><option>Até 100</option><option>101–500</option><option>501–2.000</option><option>Acima de 2.000</option></select>
+    <select value="{{ dfRegiao }}" onChange="{{ onDfRegiao }}" style="border:1.5px solid #E8ECF4;border-radius:10px;padding:9px 12px;font:400 13px Inter;color:#0D1117;background:#fff;cursor:pointer;"><option>Todos</option><option>Sul</option><option>Sudeste</option><option>Centro-Oeste</option><option>Nordeste</option><option>Norte</option></select>
+  </div>
+
+  <sc-if value="{{ dashInsufficient }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:60px 30px;text-align:center;">
+      <div style="width:54px;height:54px;border-radius:9999px;background:#F4F6FB;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#9CA3AF;">{{ ic.warn }}</div>
+      <div style="font:600 17px Inter;margin-bottom:8px;">Dados insuficientes para este recorte</div>
+      <div style="font:400 14px Inter;color:#4B5563;">Amplie os filtros para ver resultados. A menor granularidade exibível é a mediana de um grupo com no mínimo 5 empresas.</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ dashSufficient }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;flex-direction:column;gap:24px;">
+    <!-- Seção 1 percentis -->
+    <div style="display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:16px;">
+      <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:24px;border-top:3px solid #93C5FD;">
+        <div style="font:500 13px Inter;color:#4B5563;margin-bottom:10px;">Quartil inferior · P25</div>
+        <div style="font:700 36px 'JetBrains Mono',monospace;color:#93C5FD;">R$ 0,92</div>
+      </div>
+      <div style="background:#fff;border-radius:16px;box-shadow:0 4px 12px rgba(27,77,255,.12);padding:24px;border-top:3px solid #1B4DFF;outline:2px solid rgba(27,77,255,.12);">
+        <div style="font:600 13px Inter;color:#1B4DFF;margin-bottom:10px;">Mediana do mercado · P50</div>
+        <div style="font:700 44px 'JetBrains Mono',monospace;color:#1B4DFF;">R$ 1,15</div>
+      </div>
+      <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:24px;border-top:3px solid #0A1F6E;">
+        <div style="font:500 13px Inter;color:#4B5563;margin-bottom:10px;">Quartil superior · P75</div>
+        <div style="font:700 36px 'JetBrains Mono',monospace;color:#0A1F6E;">R$ 1,48</div>
+      </div>
+    </div>
+
+    <!-- Seção 2 distribuição -->
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:26px;">
+      <div style="font:600 18px Inter;margin-bottom:4px;">Distribuição do Mercado</div>
+      <div style="font:400 13px Inter;color:#4B5563;margin-bottom:28px;">% de empresas por faixa de valor (R$/km). Linha tracejada = sua empresa (R$ 1,20).</div>
+      <div style="position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:18px;height:210px;padding-bottom:2px;">
+        <div style="position:absolute;left:62%;top:0;bottom:34px;width:0;border-left:2px dashed #F59E0B;z-index:2;">
+          <span style="position:absolute;top:-6px;left:8px;white-space:nowrap;font:600 11px Inter;color:#F59E0B;background:#fff;padding:2px 6px;border-radius:6px;border:1px solid rgba(245,158,11,.4);">Sua empresa · R$ 1,20</span>
+        </div>
+        <sc-for list="{{ histo }}" as="h" hint-placeholder-count="5">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:8px;">
+            <div style="font:600 13px 'JetBrains Mono',monospace;color:#0D1117;">{{ h.pct }}%</div>
+            <div style="width:100%;max-width:60px;border-radius:8px 8px 0 0;background:{{ h.color }};height:{{ h.h }};transition:height .4s;"></div>
+            <div style="font:400 11px Inter;color:#4B5563;text-align:center;white-space:nowrap;">{{ h.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- Seção 3 sua posição -->
+    <sc-if value="{{ suaPosicao }}" hint-placeholder-val="{{ true }}">
+    <div style="background:linear-gradient(135deg,#0A1F6E,#1B4DFF);border-radius:16px;padding:28px;color:#fff;">
+      <div style="font:600 18px Inter;margin-bottom:4px;">Sua Posição no Mercado</div>
+      <div style="font:400 14px Inter;opacity:.85;margin-bottom:24px;">Sua empresa: <strong style="font-family:'JetBrains Mono',monospace;">R$ 1,20/km</strong> — você está no <strong>P62</strong> do mercado.</div>
+      <div style="position:relative;height:14px;background:rgba(255,255,255,.18);border-radius:9999px;margin:30px 0 8px;">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:62%;background:#4DFFD2;border-radius:9999px;"></div>
+        <div style="position:absolute;left:62%;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:9999px;background:#fff;border:4px solid #4DFFD2;box-shadow:0 2px 8px rgba(0,0,0,.3);"></div>
+        <span style="position:absolute;left:62%;top:-26px;transform:translateX(-50%);font:600 12px 'JetBrains Mono',monospace;color:#4DFFD2;white-space:nowrap;">P62</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font:500 12px 'JetBrains Mono',monospace;opacity:.8;"><span>P25 · R$ 0,92</span><span>P75 · R$ 1,48</span></div>
+    </div>
+    </sc-if>
+
+    <!-- Seção 4 segmento -->
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:26px;">
+      <div style="font:600 18px Inter;margin-bottom:4px;">Recorte por Segmento</div>
+      <div style="font:400 13px Inter;color:#4B5563;margin-bottom:24px;">Mediana (P50) do reembolso por setor, em R$/km.</div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <sc-for list="{{ segmentos }}" as="s" hint-placeholder-count="6">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <span style="width:90px;font:400 13px Inter;color:#0D1117;flex-shrink:0;">{{ s.label }}</span>
+            <div style="flex:1;height:26px;background:#F4F6FB;border-radius:7px;overflow:hidden;"><div style="height:100%;background:#1B4DFF;border-radius:7px;width:{{ s.w }};transition:width .5s;"></div></div>
+            <span style="width:64px;text-align:right;font:600 13px 'JetBrains Mono',monospace;color:#0D1117;flex-shrink:0;">R$ {{ s.val }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- Seção 5 tendência -->
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:26px;">
+      <div style="font:600 18px Inter;margin-bottom:4px;">Tendência da Mediana</div>
+      <div style="font:400 13px Inter;color:#4B5563;margin-bottom:24px;">Evolução do P50 (R$/km) ao longo dos ciclos de coleta.</div>
+      {{ trendChart }}
+    </div>
+  </div>
+  </sc-if>
+</main>
+</sc-if>
+
+<!-- ===================== LOGIN ===================== -->
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+<main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 24px;background:#F4F6FB;">
+  <div style="background:#fff;border-radius:24px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:44px 40px;max-width:420px;width:100%;animation:athUp .3s ease;">
+    <div style="display:flex;align-items:center;gap:9px;justify-content:center;margin-bottom:28px;">
+      <svg width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.3" fill="#1B4DFF"></circle><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4"></ellipse><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4" transform="rotate(60 12 12)"></ellipse><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4" transform="rotate(120 12 12)"></ellipse></svg>
+      <span style="font:700 24px Inter;letter-spacing:-.5px;color:#0A1F6E;">Athon</span>
+    </div>
+    <div style="font:700 24px Inter;letter-spacing:-.4px;text-align:center;margin-bottom:6px;">Bem-vindo de volta</div>
+    <div style="font:400 14px Inter;color:#4B5563;text-align:center;margin-bottom:26px;">Continue tomando decisões baseadas em dados.</div>
+    <label style="display:block;font:500 13px Inter;margin-bottom:6px;">E-mail corporativo</label>
+    <input value="marina.costa@nimbus.com.br" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;margin-bottom:16px;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><label style="font:500 13px Inter;">Senha</label><span style="font:500 12px Inter;color:#4B5563;cursor:pointer;">Esqueci minha senha</span></div>
+    <input type="password" value="senha1234" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;margin-bottom:16px;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/>
+    <label style="display:flex;align-items:center;gap:8px;font:400 14px Inter;color:#4B5563;margin-bottom:20px;cursor:pointer;"><span style="width:18px;height:18px;border-radius:5px;background:#1B4DFF;display:flex;align-items:center;justify-content:center;color:#fff;">{{ ic.checksm }}</span>Manter conectado</label>
+    <button onClick="{{ goCatalog }}" style="width:100%;background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:14px;font:600 14px Inter;cursor:pointer;margin-bottom:18px;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">Entrar</button>
+    <div style="background:rgba(27,77,255,.06);border-left:3px solid #1B4DFF;border-radius:0 8px 8px 0;padding:12px 14px;font:400 13px Inter;color:#4B5563;line-height:1.45;margin-bottom:18px;">Preencha formulários e ganhe créditos para acessar o benchmark do mercado.</div>
+    <div style="text-align:center;font:400 14px Inter;color:#4B5563;">Não tem conta? <span onClick="{{ goCadastro }}" style="color:#1B4DFF;font-weight:600;cursor:pointer;">Criar conta</span></div>
+  </div>
+</main>
+</sc-if>
+
+<!-- ===================== CADASTRO ===================== -->
+<sc-if value="{{ isCadastro }}" hint-placeholder-val="{{ false }}">
+<main style="min-height:100vh;display:grid;grid-template-columns:0.85fr 1fr;">
+  <div style="background:#0A1F6E;color:#fff;padding:56px 48px;display:flex;flex-direction:column;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="30" height="30" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.3" fill="#4DFFD2"></circle><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#fff" stroke-width="1.4"></ellipse><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#fff" stroke-width="1.4" transform="rotate(60 12 12)"></ellipse><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#fff" stroke-width="1.4" transform="rotate(120 12 12)"></ellipse></svg>
+      <span style="font:700 26px Inter;letter-spacing:-.5px;">Ath<span style="color:#4DFFD2;">o</span>n</span>
+    </div>
+    <div>
+      <div style="font:700 32px Inter;line-height:1.25;letter-spacing:-.6px;margin-bottom:16px;max-width:380px;">Ecossistema vivo de benchmark de RH</div>
+      <div style="font:400 15px Inter;opacity:.8;line-height:1.55;margin-bottom:38px;max-width:360px;">Você dá um dado, recebe o mercado inteiro. Dados confiáveis para decisões de pessoas.</div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <sc-for list="{{ benefits }}" as="b" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="width:40px;height:40px;border-radius:10px;background:rgba(77,255,210,.15);display:flex;align-items:center;justify-content:center;color:#4DFFD2;flex-shrink:0;">{{ b.iconEl }}</div>
+            <span style="font:500 15px Inter;">{{ b.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="font:400 12px Inter;opacity:.5;">Athon · Plataforma SaaS de benchmark de RH</div>
+  </div>
+
+  <div style="background:#F4F6FB;display:flex;align-items:center;justify-content:center;padding:40px 24px;overflow-y:auto;">
+    <div style="width:100%;max-width:440px;">
+      <div style="font:700 28px Inter;letter-spacing:-.5px;margin-bottom:6px;">Crie sua conta</div>
+      <div style="font:400 15px Inter;color:#4B5563;margin-bottom:24px;">Acesse dados de mercado reais para o seu RH.</div>
+
+      <div style="display:flex;background:#E8ECF4;border-radius:12px;padding:4px;margin-bottom:26px;">
+        <button onClick="{{ setTypeEmpresa }}" style="flex:1;padding:10px;border:none;border-radius:9px;font:600 13px Inter;cursor:pointer;background:{{ typeEmpresaBg }};color:{{ typeEmpresaColor }};box-shadow:{{ typeEmpresaShadow }};">Empresa</button>
+        <button onClick="{{ setTypeConsultor }}" style="flex:1;padding:10px;border:none;border-radius:9px;font:600 13px Inter;cursor:pointer;background:{{ typeConsultorBg }};color:{{ typeConsultorColor }};box-shadow:{{ typeConsultorShadow }};">Consultor externo</button>
+      </div>
+
+      <sc-if value="{{ cadEmpresa }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">Nome completo</label><input value="Marina Costa" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+        <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">E-mail corporativo</label><input value="marina.costa@nimbus.com.br" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">Empresa</label><input value="Nimbus Tecnologia" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+          <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">CNPJ</label><input value="12.345.678/0001-90" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px 'JetBrains Mono',monospace;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">Segmento</label><select style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;background:#fff;cursor:pointer;"><option>Tecnologia</option><option>Indústria</option><option>Varejo</option><option>Serviços</option><option>Saúde</option><option>Financeiro</option><option>Outro</option></select></div>
+          <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">Porte</label><select style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;background:#fff;cursor:pointer;"><option>101–500</option><option>Até 100 colaboradores</option><option>501–2.000</option><option>Acima de 2.000</option></select></div>
+        </div>
+        <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">Região</label><select style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;background:#fff;cursor:pointer;"><option>Sudeste</option><option>Sul</option><option>Centro-Oeste</option><option>Nordeste</option><option>Norte</option></select></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">Senha</label><input type="password" value="senha1234" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+          <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">Confirmar senha</label><input type="password" value="senha1234" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+        </div>
+        <button onClick="{{ submitCadastroEmpresa }}" style="width:100%;background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:14px;font:600 14px Inter;cursor:pointer;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">{{ ic.coins }} Criar conta e ganhar 10 créditos</button>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ cadConsultor }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">Nome completo</label><input value="Rafael Lima" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+        <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">E-mail profissional</label><input value="rafael@verticerh.com.br" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+        <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">Nome da consultoria</label><input value="Vértice RH" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+        <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">CNPJ da consultoria <span style="color:#9CA3AF;font-weight:400;">(opcional)</span></label><input value="33.222.111/0001-44" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px 'JetBrains Mono',monospace;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">Senha</label><input type="password" value="senha1234" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+          <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">Confirmar senha</label><input type="password" value="senha1234" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+        </div>
+        <button onClick="{{ submitCadastroConsultor }}" style="width:100%;background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:14px;font:600 14px Inter;cursor:pointer;margin-top:6px;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">Criar conta de consultor</button>
+      </div>
+      </sc-if>
+
+      <div style="text-align:center;font:400 14px Inter;color:#4B5563;margin-top:20px;">Já tenho uma conta · <span onClick="{{ goLogin }}" style="color:#1B4DFF;font-weight:600;cursor:pointer;">Entrar</span></div>
+    </div>
+  </div>
+</main>
+</sc-if>
+
+<!-- ===================== PLANOS ===================== -->
+<sc-if value="{{ isPlanos }}" hint-placeholder-val="{{ false }}">
+<main style="max-width:1080px;margin:0 auto;padding:34px 28px 80px;animation:athFade .2s;">
+  <div style="font:700 36px Inter;letter-spacing:-.8px;margin-bottom:6px;">Créditos e Planos</div>
+  <div style="font:400 16px Inter;color:#4B5563;margin-bottom:28px;">Contribua com dados e ganhe créditos. Ou escolha um plano para acesso contínuo.</div>
+
+  <div style="background:linear-gradient(135deg,#0A1F6E,#1B4DFF);border-radius:20px;padding:28px 30px;color:#fff;margin-bottom:28px;display:flex;flex-wrap:wrap;gap:30px;align-items:center;justify-content:space-between;">
+    <div style="display:flex;align-items:center;gap:18px;">
+      <div style="width:60px;height:60px;border-radius:16px;background:rgba(77,255,210,.18);display:flex;align-items:center;justify-content:center;color:#4DFFD2;">{{ ic.coinsbig }}</div>
+      <div><div style="font:700 42px 'JetBrains Mono',monospace;line-height:1;">{{ credits }}</div><div style="font:400 14px Inter;opacity:.8;margin-top:4px;">créditos disponíveis</div></div>
+    </div>
+    <div style="flex:1;min-width:280px;background:rgba(255,255,255,.08);border-radius:14px;padding:16px 18px;">
+      <div style="font:600 12px Inter;opacity:.7;text-transform:uppercase;letter-spacing:.4px;margin-bottom:12px;">Movimentações recentes</div>
+      <sc-for list="{{ history }}" as="h" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.1);">
+          <div><div style="font:500 13px Inter;">{{ h.desc }}</div><div style="font:400 11px Inter;opacity:.6;">{{ h.date }}</div></div>
+          <span style="font:600 14px 'JetBrains Mono',monospace;color:{{ h.color }};">{{ h.delta }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:0.9fr 1.4fr;gap:24px;align-items:start;">
+    <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:26px;">
+      <div style="font:600 18px Inter;margin-bottom:18px;">Como ganhar créditos grátis</div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;"><span style="color:#10B981;flex-shrink:0;margin-top:1px;">{{ ic.check }}</span><div><div style="font:500 14px Inter;">Cadastrar sua empresa</div><div style="font:400 13px Inter;color:#4B5563;">+10 créditos (uma única vez)</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;"><span style="color:#10B981;flex-shrink:0;margin-top:1px;">{{ ic.check }}</span><div><div style="font:500 14px Inter;">Responder um tema</div><div style="font:400 13px Inter;color:#4B5563;">+5 créditos por tema</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;"><span style="color:#10B981;flex-shrink:0;margin-top:1px;">{{ ic.check }}</span><div><div style="font:500 14px Inter;">Atualizar um tema a cada 6 meses</div><div style="font:400 13px Inter;color:#4B5563;">gera novos créditos</div></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+        <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;display:flex;flex-direction:column;">
+          <div style="font:600 15px Inter;margin-bottom:4px;">Pacote 50 créditos</div>
+          <div style="font:400 12px Inter;color:#4B5563;margin-bottom:16px;flex:1;">Acesso avulso a temas específicos</div>
+          <div style="font:700 26px 'JetBrains Mono',monospace;margin-bottom:16px;">R$ 500</div>
+          <button onClick="{{ buyPacote }}" style="width:100%;background:transparent;border:1.5px solid #1B4DFF;color:#1B4DFF;border-radius:10px;padding:11px;font:600 13px Inter;cursor:pointer;" style-hover="background:rgba(27,77,255,.06);">Comprar pacote</button>
+        </div>
+        <div style="background:#fff;border-radius:16px;box-shadow:0 4px 12px rgba(27,77,255,.14);padding:22px;display:flex;flex-direction:column;border:2px solid #1B4DFF;position:relative;">
+          <span style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#1B4DFF;color:#fff;font:600 11px Inter;padding:4px 12px;border-radius:9999px;white-space:nowrap;">Mais popular</span>
+          <div style="font:600 15px Inter;margin-bottom:4px;">Assinatura Anual</div>
+          <div style="font:400 12px Inter;color:#4B5563;margin-bottom:16px;flex:1;">Acesso ilimitado a todos os temas e dashboards</div>
+          <div style="font:700 26px 'JetBrains Mono',monospace;margin-bottom:2px;">R$ 3.000</div>
+          <div style="font:400 12px Inter;color:#4B5563;margin-bottom:16px;">por ano</div>
+          <button onClick="{{ buyAnual }}" style="width:100%;background:#1B4DFF;border:none;color:#fff;border-radius:10px;padding:11px;font:600 13px Inter;cursor:pointer;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">Assinar agora</button>
+        </div>
+        <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;display:flex;flex-direction:column;">
+          <div style="font:600 15px Inter;margin-bottom:4px;">White-label</div>
+          <div style="font:400 12px Inter;color:#4B5563;margin-bottom:16px;flex:1;">Para consultorias com múltiplos clientes</div>
+          <div style="font:700 26px 'JetBrains Mono',monospace;margin-bottom:2px;">R$ 12.000</div>
+          <div style="font:400 12px Inter;color:#4B5563;margin-bottom:16px;">por ano</div>
+          <button onClick="{{ contactComercial }}" style="width:100%;background:transparent;border:1.5px solid #E8ECF4;color:#0A1F6E;border-radius:10px;padding:11px;font:600 13px Inter;cursor:pointer;" style-hover="background:#F4F6FB;">Falar com comercial</button>
+        </div>
+      </div>
+
+      <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;margin-top:16px;">
+        <div style="font:600 15px Inter;margin-bottom:14px;">Uso de créditos</div>
+        <div style="display:flex;flex-direction:column;">
+          <div style="display:grid;grid-template-columns:2fr 1fr 2fr;gap:12px;padding:8px 0;border-bottom:1.5px solid #E8ECF4;font:600 12px Inter;color:#9CA3AF;text-transform:uppercase;letter-spacing:.3px;"><span>Ação</span><span style="text-align:center;">Créditos</span><span>Observação</span></div>
+          <sc-for list="{{ usoCreditos }}" as="u" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:2fr 1fr 2fr;gap:12px;padding:11px 0;border-bottom:1px solid #F4F6FB;font:400 13px Inter;align-items:center;"><span style="color:#0D1117;">{{ u.acao }}</span><span style="text-align:center;font:600 13px 'JetBrains Mono',monospace;color:{{ u.color }};">{{ u.cr }}</span><span style="color:#4B5563;">{{ u.obs }}</span></div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</sc-if>
+
+<!-- ===================== CONSULTORES VINCULADOS (EMPRESA) ===================== -->
+<sc-if value="{{ isConsultores }}" hint-placeholder-val="{{ false }}">
+<main style="max-width:820px;margin:0 auto;padding:34px 28px 80px;animation:athFade .2s;">
+  <div style="font:700 28px Inter;letter-spacing:-.5px;margin-bottom:6px;">Consultores vinculados</div>
+  <div style="font:400 15px Inter;color:#4B5563;margin-bottom:28px;">Profissionais externos que podem solicitar formulários e ver seus benchmarks.</div>
+  <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <div style="width:48px;height:48px;border-radius:9999px;background:#1B4DFF;color:#fff;display:flex;align-items:center;justify-content:center;font:600 15px Inter;">RL</div>
+      <div>
+        <div style="font:600 16px Inter;">Rafael Lima</div>
+        <div style="font:400 13px Inter;color:#4B5563;">Vértice RH · rafael@verticerh.com.br</div>
+        <div style="font:400 12px Inter;color:#9CA3AF;margin-top:2px;">Vinculado em 10/06/2026</div>
+      </div>
+    </div>
+    <button onClick="{{ unlinkConsultorEmpresa }}" style="background:transparent;border:1.5px solid #EF4444;color:#EF4444;border-radius:10px;padding:10px 18px;font:600 13px Inter;cursor:pointer;" style-hover="background:#FEF2F2;">Desvincular</button>
+  </div>
+</main>
+</sc-if>
+
+<!-- ===================== CONSULTOR: CLIENTES ===================== -->
+<sc-if value="{{ isCClientes }}" hint-placeholder-val="{{ false }}">
+<main style="max-width:1140px;margin:0 auto;padding:34px 28px 80px;animation:athFade .2s;">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px;">
+    <div>
+      <div style="font:700 28px Inter;letter-spacing:-.5px;margin-bottom:6px;">Minhas empresas-cliente</div>
+      <div style="font:400 15px Inter;color:#4B5563;">Cadastre empresas, escolha formulários e acompanhe os benchmarks delas.</div>
+    </div>
+    <button onClick="{{ goNovo }}" style="background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:13px 20px;font:600 13px Inter;cursor:pointer;display:flex;align-items:center;gap:8px;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">{{ ic.plus }} Cadastrar nova empresa</button>
+  </div>
+  <div style="display:flex;gap:24px;margin-bottom:28px;">
+    <div style="display:flex;align-items:center;gap:8px;font:500 14px Inter;color:#4B5563;"><span style="width:9px;height:9px;border-radius:9999px;background:#10B981;"></span><strong style="color:#0D1117;">{{ countVinculadas }}</strong> empresas vinculadas</div>
+    <div style="display:flex;align-items:center;gap:8px;font:500 14px Inter;color:#4B5563;"><span style="width:9px;height:9px;border-radius:9999px;background:#F59E0B;"></span><strong style="color:#0D1117;">{{ countPendentes }}</strong> convites pendentes</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;">
+    <sc-for list="{{ clientCards }}" as="c" hint-placeholder-count="3">
+      <div style="position:relative;background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:22px;opacity:{{ c.opacity }};">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;">
+          <div>
+            <div style="font:600 19px Inter;letter-spacing:-.3px;margin-bottom:3px;">{{ c.name }}</div>
+            <div style="font:400 12px 'JetBrains Mono',monospace;color:#9CA3AF;">{{ c.cnpj }}</div>
+          </div>
+          <div onClick="{{ c.onMenu }}" style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:#F4F6FB;">{{ ic.morev }}</div>
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;">
+          <span style="font:500 12px Inter;color:#4B5563;background:#F4F6FB;border-radius:6px;padding:4px 9px;">{{ c.seg }}</span>
+          <span style="font:500 12px Inter;color:#4B5563;background:#F4F6FB;border-radius:6px;padding:4px 9px;">{{ c.porte }}</span>
+          <span style="font:500 12px Inter;color:#4B5563;background:#F4F6FB;border-radius:6px;padding:4px 9px;">{{ c.regiao }}</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <span style="display:inline-flex;align-items:center;gap:6px;background:{{ c.creditBg }};color:{{ c.creditColor }};border-radius:6px;padding:5px 11px;font:600 13px Inter;">{{ ic.coins }} {{ c.credits }} créditos</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;background:{{ c.statusBg }};color:{{ c.statusColor }};border-radius:9999px;padding:4px 11px;font:600 12px Inter;"><span style="width:7px;height:7px;border-radius:9999px;background:{{ c.statusDot }};"></span>{{ c.status }}</span>
+        </div>
+        <div style="font:400 12px Inter;color:#4B5563;margin-bottom:6px;">{{ c.answered }} de 22 formulários respondidos</div>
+        <div style="height:6px;background:#F4F6FB;border-radius:9999px;overflow:hidden;"><div style="height:100%;background:#1B4DFF;border-radius:9999px;width:{{ c.progressW }};"></div></div>
+
+        <sc-if value="{{ c.menuOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;right:18px;top:54px;width:248px;background:#fff;border:1px solid #E8ECF4;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:6px;z-index:20;animation:athFade .12s;">
+            <sc-if value="{{ c.canDash }}" hint-placeholder-val="{{ true }}">
+              <div onClick="{{ c.onVerDash }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font:500 13px Inter;color:#0D1117;cursor:pointer;" style-hover="background:#F4F6FB;">{{ ic.barchartdark }} Ver dashboards da empresa</div>
+            </sc-if>
+            <sc-if value="{{ c.dashBlocked }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ c.onVerDash }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font:500 13px Inter;color:#9CA3AF;cursor:pointer;">{{ ic.barchartgray }} Ver dashboards <span style="font-size:11px;">(sem créditos)</span></div>
+            </sc-if>
+            <sc-if value="{{ c.notPending }}" hint-placeholder-val="{{ true }}">
+              <div onClick="{{ c.onEnviar }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font:500 13px Inter;color:#0D1117;cursor:pointer;" style-hover="background:#F4F6FB;">{{ ic.send2 }} Selecionar e enviar formulários</div>
+            </sc-if>
+            <sc-if value="{{ c.isPending }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ c.onReenviar }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font:500 13px Inter;color:#0D1117;cursor:pointer;" style-hover="background:#F4F6FB;">{{ ic.mail2 }} Reenviar convite</div>
+            </sc-if>
+            <div style="height:1px;background:#E8ECF4;margin:6px 4px;"></div>
+            <div onClick="{{ c.onDesvincular }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font:500 13px Inter;color:#EF4444;cursor:pointer;" style-hover="background:#FEF2F2;">{{ ic.unlinksm }} Desvincular empresa</div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+</main>
+</sc-if>
+
+<!-- ===================== CONSULTOR: NOVO CLIENTE ===================== -->
+<sc-if value="{{ isCNovo }}" hint-placeholder-val="{{ false }}">
+<main style="max-width:560px;margin:0 auto;padding:40px 28px 80px;animation:athFade .2s;">
+  <div onClick="{{ goClientes }}" style="display:inline-flex;align-items:center;gap:6px;font:400 13px Inter;color:#4B5563;margin-bottom:18px;cursor:pointer;">{{ ic.arrowleft }} Voltar para clientes</div>
+  <div style="font:700 28px Inter;letter-spacing:-.5px;margin-bottom:6px;">Cadastrar nova empresa</div>
+  <div style="font:400 15px Inter;color:#4B5563;margin-bottom:28px;">A empresa receberá um e-mail para aceitar o vínculo e acessar a plataforma.</div>
+  <div style="background:#fff;border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:28px;display:flex;flex-direction:column;gap:18px;">
+    <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">CNPJ da empresa</label><input value="" placeholder="00.000.000/0000-00" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px 'JetBrains Mono',monospace;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+    <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">E-mail do responsável</label><input value="" placeholder="responsavel@empresa.com.br" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+    <div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">Nome da empresa <span style="color:#9CA3AF;font-weight:400;">(opcional)</span></label><input value="" placeholder="Pode ser preenchido pela empresa no aceite" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px Inter;" style-focus="border-color:#1B4DFF;box-shadow:0 0 0 3px rgba(27,77,255,.12);outline:none;"/></div>
+    <button onClick="{{ enviarConvite }}" style="width:100%;background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:14px;font:600 14px Inter;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">{{ ic.send }} Enviar convite</button>
+  </div>
+</main>
+</sc-if>
+
+<!-- ===================== CONSULTOR: ENVIO DE FORMULÁRIOS ===================== -->
+<sc-if value="{{ isCEnvio }}" hint-placeholder-val="{{ false }}">
+<main style="max-width:820px;margin:0 auto;padding:34px 28px 40px;animation:athFade .2s;">
+  <div onClick="{{ goClientes }}" style="display:inline-flex;align-items:center;gap:6px;font:400 13px Inter;color:#4B5563;margin-bottom:16px;cursor:pointer;">Clientes <span style="color:#9CA3AF;">/</span> Nimbus Tecnologia <span style="color:#9CA3AF;">/</span> <span style="color:#0D1117;font-weight:500;">Enviar formulários</span></div>
+  <div style="font:700 26px Inter;letter-spacing:-.5px;margin-bottom:6px;">Selecionar formulários</div>
+  <div style="font:400 14px Inter;color:#4B5563;margin-bottom:22px;">Escolha quais temas a empresa-cliente deve responder. Ela receberá um link público com chave de acesso, sem precisar de login.</div>
+  <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid #E8ECF4;border-radius:10px;padding:0 14px;margin-bottom:14px;">
+    <span style="display:flex;">{{ ic.search }}</span><input value="" placeholder="Buscar tema…" style="flex:1;border:none;outline:none;padding:12px 0;font:400 14px Inter;"/>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <sc-for list="{{ envioThemes }}" as="t" hint-placeholder-count="6">
+      <label onClick="{{ t.onToggle }}" style="display:flex;align-items:center;gap:14px;background:#fff;border:1.5px solid {{ t.border }};border-radius:12px;padding:14px 16px;cursor:pointer;">
+        <span style="width:22px;height:22px;border-radius:6px;border:2px solid {{ t.boxBorder }};background:{{ t.boxBg }};display:flex;align-items:center;justify-content:center;flex-shrink:0;">{{ t.checkEl }}</span>
+        <span style="width:38px;height:38px;border-radius:9px;background:rgba(27,77,255,.08);display:flex;align-items:center;justify-content:center;color:#1B4DFF;flex-shrink:0;">{{ t.iconEl }}</span>
+        <span style="flex:1;"><span style="display:block;font:600 14px Inter;color:#0D1117;">{{ t.title }}</span><span style="display:block;font:400 12px Inter;color:#9CA3AF;">{{ t.category }}</span></span>
+        <sc-if value="{{ t.respondido }}" hint-placeholder-val="{{ false }}"><span style="font:600 11px Inter;color:#0a7a55;background:rgba(16,185,129,.12);border-radius:6px;padding:4px 8px;">Já respondido</span></sc-if>
+      </label>
+    </sc-for>
+  </div>
+</main>
+<div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #E8ECF4;padding:16px 24px;z-index:30;margin-top:auto;">
+  <div style="max-width:820px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+    <span style="font:600 14px Inter;color:#0D1117;">{{ selectedCount }} formulários selecionados</span>
+    <button onClick="{{ enviarFormularios }}" style="background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:13px 24px;font:600 13px Inter;cursor:pointer;display:flex;align-items:center;gap:8px;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">{{ ic.send }} Enviar para Nimbus Tecnologia</button>
+  </div>
+</div>
+</sc-if>
+
+<!-- ===================== ACEITE (público) ===================== -->
+<sc-if value="{{ isAceite }}" hint-placeholder-val="{{ false }}">
+<main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 24px;background:#F4F6FB;">
+  <div style="background:#fff;border-radius:24px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:44px 40px;max-width:480px;width:100%;animation:athUp .3s;">
+    <div style="display:flex;align-items:center;gap:9px;justify-content:center;margin-bottom:8px;">
+      <svg width="28" height="28" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.3" fill="#1B4DFF"></circle><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4"></ellipse><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4" transform="rotate(60 12 12)"></ellipse><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4" transform="rotate(120 12 12)"></ellipse></svg>
+      <span style="font:700 22px Inter;letter-spacing:-.5px;color:#0A1F6E;">Athon</span>
+    </div>
+    <div style="font:400 12px Inter;color:#9CA3AF;text-align:center;margin-bottom:18px;">Simulação do e-mail recebido pela empresa</div>
+    <div style="font:700 22px Inter;letter-spacing:-.4px;line-height:1.3;text-align:center;margin-bottom:20px;">A consultoria Vértice RH convidou sua empresa para a Athon</div>
+    <div style="background:#F4F6FB;border-radius:12px;padding:18px;margin-bottom:18px;font:400 13px Inter;color:#4B5563;line-height:1.6;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span>CNPJ</span><strong style="color:#0D1117;font-family:'JetBrains Mono',monospace;">45.111.222/0001-33</strong></div>
+      <div style="display:flex;justify-content:space-between;"><span>E-mail responsável</span><strong style="color:#0D1117;">contato@lumen.com.br</strong></div>
+    </div>
+    <div style="font:400 13px Inter;color:#4B5563;line-height:1.5;margin-bottom:24px;">O consultor poderá selecionar formulários para você responder e visualizar os benchmarks que sua empresa desbloquear. Você receberá uma senha temporária por e-mail para acessar sua conta.</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button onClick="{{ aceitarConvite }}" style="width:100%;background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:14px;font:600 14px Inter;cursor:pointer;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">Aceitar e acessar a plataforma</button>
+      <button onClick="{{ recusarConvite }}" style="width:100%;background:none;border:none;color:#4B5563;font:600 13px Inter;cursor:pointer;padding:8px;">Recusar convite</button>
+    </div>
+  </div>
+</main>
+</sc-if>
+
+<!-- ===================== RESPONDER: LISTA (público) ===================== -->
+<sc-if value="{{ isRespList }}" hint-placeholder-val="{{ false }}">
+<main style="min-height:100vh;background:#F4F6FB;">
+  <div style="background:#fff;border-bottom:1px solid #E8ECF4;padding:18px 28px;display:flex;align-items:center;gap:9px;">
+    <svg width="26" height="26" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.3" fill="#1B4DFF"></circle><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4"></ellipse><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4" transform="rotate(60 12 12)"></ellipse><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4" transform="rotate(120 12 12)"></ellipse></svg>
+    <span style="font:700 21px Inter;letter-spacing:-.5px;color:#0A1F6E;">Athon</span>
+  </div>
+  <div style="max-width:680px;margin:0 auto;padding:34px 24px 60px;animation:athFade .2s;">
+    <div style="font:700 26px Inter;letter-spacing:-.5px;margin-bottom:6px;">Formulários solicitados por Vértice RH</div>
+    <div style="font:400 14px Inter;color:#4B5563;line-height:1.5;margin-bottom:20px;">Responda abaixo. Suas respostas ficam vinculadas à sua empresa (CNPJ) e poderão ser acessadas por você depois.</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;">
+      <div style="flex:1;height:8px;background:#E8ECF4;border-radius:9999px;overflow:hidden;"><div style="height:100%;background:#1B4DFF;border-radius:9999px;width:{{ respProgressW }};transition:width .3s;"></div></div>
+      <span style="font:600 13px Inter;color:#0D1117;white-space:nowrap;">{{ respDoneCount }} de {{ respTotal }} respondidos</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <sc-for list="{{ respForms }}" as="t" hint-placeholder-count="3">
+        <div style="background:#fff;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.08);padding:18px 20px;display:flex;align-items:center;gap:16px;">
+          <span style="width:42px;height:42px;border-radius:10px;background:rgba(27,77,255,.08);display:flex;align-items:center;justify-content:center;color:#1B4DFF;flex-shrink:0;">{{ t.iconEl }}</span>
+          <div style="flex:1;"><div style="font:600 15px Inter;color:#0D1117;">{{ t.title }}</div><div style="font:400 12px Inter;color:#9CA3AF;">~5 minutos</div></div>
+          <sc-if value="{{ t.done }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:5px;font:600 13px Inter;color:#0a7a55;">{{ ic.checkgreen }} Respondido</span></sc-if>
+          <sc-if value="{{ t.notDone }}" hint-placeholder-val="{{ true }}"><button onClick="{{ t.onRespond }}" style="background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:10px 18px;font:600 13px Inter;cursor:pointer;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">Responder</button></sc-if>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:20px;font:400 12px Inter;color:#9CA3AF;display:flex;align-items:center;gap:6px;">Vinculado ao CNPJ 12.345.678/0001-90 · suas respostas são anonimizadas no benchmark</div>
+    <button onClick="{{ concluirResponder }}" style="margin-top:24px;background:none;border:1.5px solid #E8ECF4;color:#4B5563;border-radius:10px;padding:12px 20px;font:600 13px Inter;cursor:pointer;">Concluir e voltar ao painel do consultor</button>
+  </div>
+</main>
+</sc-if>
+
+<!-- ===================== LANDING ===================== -->
+<sc-if value="{{ isLanding }}" hint-placeholder-val="{{ false }}">
+<div style="background:#fff;">
+  <!-- nav -->
+  <header style="position:sticky;top:0;z-index:40;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border-bottom:1px solid #E8ECF4;height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <svg width="27" height="27" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.3" fill="#1B4DFF"></circle><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4"></ellipse><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4" transform="rotate(60 12 12)"></ellipse><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#1B4DFF" stroke-width="1.4" transform="rotate(120 12 12)"></ellipse></svg>
+      <span style="font:700 22px Inter;letter-spacing:-.5px;color:#0A1F6E;">Athon</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <button onClick="{{ goLogin }}" style="background:none;border:none;color:#0A1F6E;font:600 14px Inter;cursor:pointer;">Entrar</button>
+      <button onClick="{{ goCadastro }}" style="background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:11px 20px;font:600 13px Inter;cursor:pointer;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">Criar conta</button>
+    </div>
+  </header>
+
+  <!-- hero -->
+  <section style="background:radial-gradient(1100px 600px at 75% -10%,rgba(77,255,210,.18),transparent),linear-gradient(160deg,#0A1F6E 0%,#1B4DFF 100%);color:#fff;padding:90px 32px 100px;position:relative;overflow:hidden;">
+    <div style="max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.15fr .85fr;gap:50px;align-items:center;">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(77,255,210,.15);border:1px solid rgba(77,255,210,.35);border-radius:9999px;padding:7px 14px;font:600 12px Inter;color:#4DFFD2;margin-bottom:24px;"><span style="width:7px;height:7px;border-radius:9999px;background:#4DFFD2;animation:athPulse 1.6s infinite;"></span>Ecossistema vivo de benchmark de RH</div>
+        <h1 style="font:700 54px/1.08 Inter;letter-spacing:-1.5px;margin:0 0 22px;max-width:640px;">Você dá um dado,<br>recebe o <span style="color:#4DFFD2;">mercado inteiro.</span></h1>
+        <p style="font:400 18px/1.6 Inter;opacity:.85;max-width:520px;margin:0 0 34px;">Empresas contribuem com dados de suas próprias políticas e acessam, em troca, o panorama real do mercado — por setor, porte e região. Dados confiáveis para decisões de pessoas.</p>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;">
+          <button onClick="{{ goCadastro }}" style="background:#4DFFD2;color:#0A1F6E;border:none;border-radius:11px;padding:16px 28px;font:700 15px Inter;cursor:pointer;display:flex;align-items:center;gap:8px;" style-hover="box-shadow:0 8px 24px rgba(77,255,210,.3);">Começar e ganhar 10 créditos {{ ic.arrowright }}</button>
+          <button onClick="{{ goCatalog }}" style="background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:11px;padding:16px 28px;font:600 15px Inter;cursor:pointer;" style-hover="background:rgba(255,255,255,.18);">Ver a plataforma</button>
+        </div>
+        <div style="display:flex;gap:32px;margin-top:44px;">
+          <div><div style="font:700 30px 'JetBrains Mono',monospace;color:#4DFFD2;">1.284</div><div style="font:400 13px Inter;opacity:.7;">empresas no ecossistema</div></div>
+          <div><div style="font:700 30px 'JetBrains Mono',monospace;color:#4DFFD2;">22</div><div style="font:400 13px Inter;opacity:.7;">temas de benchmark</div></div>
+          <div><div style="font:700 30px 'JetBrains Mono',monospace;color:#4DFFD2;">5min</div><div style="font:400 13px Inter;opacity:.7;">por formulário</div></div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;position:relative;">
+        <svg width="320" height="320" viewBox="0 0 320 320" style="filter:drop-shadow(0 12px 40px rgba(0,0,0,.3));">
+          <ellipse cx="160" cy="160" rx="140" ry="54" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5"></ellipse>
+          <ellipse cx="160" cy="160" rx="140" ry="54" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5" transform="rotate(60 160 160)"></ellipse>
+          <ellipse cx="160" cy="160" rx="140" ry="54" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5" transform="rotate(120 160 160)"></ellipse>
+          <circle cx="160" cy="160" r="22" fill="#4DFFD2"></circle>
+          <circle cx="300" cy="160" r="8" fill="#fff"></circle>
+          <circle cx="90" cy="58" r="8" fill="#fff"></circle>
+          <circle cx="90" cy="262" r="8" fill="#fff"></circle>
+          <circle cx="230" cy="262" r="8" fill="#4DFFD2"></circle>
+          <circle cx="230" cy="58" r="8" fill="#4DFFD2"></circle>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- como funciona -->
+  <section style="max-width:1080px;margin:0 auto;padding:80px 32px;">
+    <div style="text-align:center;margin-bottom:50px;">
+      <div style="font:600 13px Inter;letter-spacing:.5px;text-transform:uppercase;color:#1B4DFF;margin-bottom:10px;">Como funciona</div>
+      <h2 style="font:700 36px Inter;letter-spacing:-.8px;margin:0;">Efeito de rede no centro da experiência</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px;">
+      <div style="background:#F4F6FB;border-radius:18px;padding:30px;">
+        <div style="width:48px;height:48px;border-radius:12px;background:#1B4DFF;color:#fff;display:flex;align-items:center;justify-content:center;font:700 18px 'JetBrains Mono',monospace;margin-bottom:18px;">1</div>
+        <div style="font:600 19px Inter;margin-bottom:8px;">Responda um tema</div>
+        <div style="font:400 14px Inter;color:#4B5563;line-height:1.55;">Formulários micro e atômicos de 5 a 10 minutos sobre suas políticas de RH. Cada resposta vale +5 créditos.</div>
+      </div>
+      <div style="background:#F4F6FB;border-radius:18px;padding:30px;">
+        <div style="width:48px;height:48px;border-radius:12px;background:#1B4DFF;color:#fff;display:flex;align-items:center;justify-content:center;font:700 18px 'JetBrains Mono',monospace;margin-bottom:18px;">2</div>
+        <div style="font:600 19px Inter;margin-bottom:8px;">Seus dados são anonimizados</div>
+        <div style="font:400 14px Inter;color:#4B5563;line-height:1.55;">Nada é associado à sua empresa. Tudo é agregado em percentis e medianas, com granularidade mínima de 5 empresas.</div>
+      </div>
+      <div style="background:#F4F6FB;border-radius:18px;padding:30px;">
+        <div style="width:48px;height:48px;border-radius:12px;background:#1B4DFF;color:#fff;display:flex;align-items:center;justify-content:center;font:700 18px 'JetBrains Mono',monospace;margin-bottom:18px;">3</div>
+        <div style="font:600 19px Inter;margin-bottom:8px;">Acesse o benchmark</div>
+        <div style="font:400 14px Inter;color:#4B5563;line-height:1.55;">Dashboards ao vivo com P25, mediana e P75, distribuição do mercado e a sua posição — filtrados por setor, porte e região.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- temas -->
+  <section style="background:#F4F6FB;padding:80px 32px;">
+    <div style="max-width:1080px;margin:0 auto;">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:36px;">
+        <div>
+          <div style="font:600 13px Inter;letter-spacing:.5px;text-transform:uppercase;color:#1B4DFF;margin-bottom:10px;">22 temas de benchmark</div>
+          <h2 style="font:700 36px Inter;letter-spacing:-.8px;margin:0;">De remuneração a benefícios flexíveis</h2>
+        </div>
+        <button onClick="{{ goCatalog }}" style="background:#fff;border:1.5px solid #E8ECF4;color:#0A1F6E;border-radius:10px;padding:12px 20px;font:600 13px Inter;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="box-shadow:0 4px 12px rgba(0,0,0,.08);">Ver catálogo completo {{ ic.arrowright2 }}</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+        <sc-for list="{{ landingThemes }}" as="t" hint-placeholder-count="8">
+          <div style="background:#fff;border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:20px;border-top:3px solid #1B4DFF;">
+            <div style="width:42px;height:42px;border-radius:10px;background:rgba(27,77,255,.08);display:flex;align-items:center;justify-content:center;color:#1B4DFF;margin-bottom:14px;">{{ t.iconEl }}</div>
+            <div style="font:500 11px Inter;letter-spacing:.3px;text-transform:uppercase;color:#1B4DFF;margin-bottom:6px;">{{ t.category }}</div>
+            <div style="font:600 15px Inter;line-height:1.3;color:#0D1117;">{{ t.title }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- personas -->
+  <section style="max-width:1080px;margin:0 auto;padding:80px 32px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div style="border:1.5px solid #E8ECF4;border-radius:18px;padding:34px;">
+        <div style="width:50px;height:50px;border-radius:13px;background:rgba(27,77,255,.1);display:flex;align-items:center;justify-content:center;color:#1B4DFF;margin-bottom:18px;">{{ ic.buildingbig }}</div>
+        <div style="font:700 22px Inter;letter-spacing:-.3px;margin-bottom:10px;">Para empresas</div>
+        <div style="font:400 15px Inter;color:#4B5563;line-height:1.6;margin-bottom:20px;">Contribua com dados, ganhe créditos e acesse o panorama do mercado. 10 créditos grátis ao cadastrar.</div>
+        <button onClick="{{ goCadastro }}" style="background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:13px 22px;font:600 13px Inter;cursor:pointer;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">Criar conta de empresa</button>
+      </div>
+      <div style="border:1.5px solid #E8ECF4;border-radius:18px;padding:34px;">
+        <div style="width:50px;height:50px;border-radius:13px;background:rgba(10,31,110,.08);display:flex;align-items:center;justify-content:center;color:#0A1F6E;margin-bottom:18px;">{{ ic.usersbig }}</div>
+        <div style="font:700 22px Inter;letter-spacing:-.3px;margin-bottom:10px;">Para consultores</div>
+        <div style="font:400 15px Inter;color:#4B5563;line-height:1.6;margin-bottom:20px;">Gerencie quantas empresas-cliente quiser, sem custo. Envie formulários e acompanhe os benchmarks delas.</div>
+        <button onClick="{{ goCadastro }}" style="background:transparent;color:#0A1F6E;border:1.5px solid #0A1F6E;border-radius:10px;padding:13px 22px;font:600 13px Inter;cursor:pointer;" style-hover="background:#F4F6FB;">Criar conta de consultor</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- final cta -->
+  <section style="background:#0A1F6E;color:#fff;padding:80px 32px;text-align:center;">
+    <h2 style="font:700 40px Inter;letter-spacing:-1px;margin:0 0 16px;max-width:680px;margin-left:auto;margin-right:auto;">Comece a tomar decisões baseadas no mercado real</h2>
+    <p style="font:400 17px Inter;opacity:.8;margin:0 0 32px;">Cadastre-se em minutos e ganhe 10 créditos de boas-vindas.</p>
+    <button onClick="{{ goCadastro }}" style="background:#4DFFD2;color:#0A1F6E;border:none;border-radius:11px;padding:16px 32px;font:700 15px Inter;cursor:pointer;" style-hover="box-shadow:0 8px 24px rgba(77,255,210,.3);">Criar minha conta</button>
+  </section>
+
+  <!-- footer -->
+  <footer style="background:#0D1117;color:#9CA3AF;padding:36px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <svg width="22" height="22" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.3" fill="#4DFFD2"></circle><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#9CA3AF" stroke-width="1.4"></ellipse><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="#9CA3AF" stroke-width="1.4" transform="rotate(60 12 12)"></ellipse></svg>
+      <span style="font:600 16px Inter;color:#fff;">Athon</span>
+    </div>
+    <span style="font:400 13px Inter;">Átomo + H de Humano · A menor unidade de inteligência de mercado para o RH</span>
+  </footer>
+</div>
+</sc-if>
+
+</div><!-- /content column -->
+
+<!-- ===================== MODAIS ===================== -->
+<sc-if value="{{ modalInsufficient }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(13,17,23,.5);z-index:80;display:flex;align-items:center;justify-content:center;padding:24px;animation:athFade .15s;" onClick="{{ closeModal }}">
+  <div onClick="{{ stop }}" style="background:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:34px;max-width:420px;width:100%;animation:athUp .2s;">
+    <div style="width:56px;height:56px;border-radius:9999px;background:rgba(245,158,11,.12);display:flex;align-items:center;justify-content:center;color:#F59E0B;margin-bottom:18px;">{{ ic.warn }}</div>
+    <div style="font:700 20px Inter;letter-spacing:-.3px;margin-bottom:8px;">Você precisa de 3 créditos para ver este benchmark</div>
+    <div style="font:400 14px Inter;color:#4B5563;line-height:1.5;margin-bottom:24px;">Seu saldo atual é de {{ credits }} créditos. Responda um tema para ganhar mais, ou conheça nossos planos.</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button onClick="{{ goCatalogFromModal }}" style="width:100%;background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:13px;font:600 13px Inter;cursor:pointer;">Responder outro tema e ganhar +5</button>
+      <button onClick="{{ goPlanosFromModal }}" style="width:100%;background:transparent;border:1.5px solid #E8ECF4;color:#0A1F6E;border-radius:10px;padding:13px;font:600 13px Inter;cursor:pointer;">Ver planos</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ modalCheckout }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(13,17,23,.5);z-index:80;display:flex;align-items:center;justify-content:center;padding:24px;animation:athFade .15s;" onClick="{{ closeModal }}">
+  <div onClick="{{ stop }}" style="background:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:32px;max-width:440px;width:100%;animation:athUp .2s;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div style="font:700 20px Inter;letter-spacing:-.3px;">Finalizar compra</div><span onClick="{{ closeModal }}" style="cursor:pointer;color:#9CA3AF;">{{ ic.x }}</span></div>
+    <div style="font:400 14px Inter;color:#4B5563;margin-bottom:20px;">{{ checkoutDesc }}</div>
+    <div style="background:#F4F6FB;border-radius:12px;padding:16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;"><span style="font:500 14px Inter;">{{ checkoutPlan }}</span><span style="font:700 18px 'JetBrains Mono',monospace;color:#1B4DFF;">{{ checkoutPrice }}</span></div>
+    <label style="display:block;font:500 13px Inter;margin-bottom:6px;">Número do cartão</label>
+    <input value="4111 1111 1111 1111" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px 'JetBrains Mono',monospace;margin-bottom:14px;"/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;"><div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">Validade</label><input value="12/28" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px 'JetBrains Mono',monospace;"/></div><div><label style="display:block;font:500 13px Inter;margin-bottom:6px;">CVV</label><input value="123" style="width:100%;border:1.5px solid #E8ECF4;border-radius:10px;padding:12px 14px;font:400 15px 'JetBrains Mono',monospace;"/></div></div>
+    <button onClick="{{ confirmCheckout }}" style="width:100%;background:#1B4DFF;color:#fff;border:none;border-radius:10px;padding:14px;font:600 14px Inter;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;" style-hover="box-shadow:0 4px 16px rgba(27,77,255,.24);">{{ ic.lock }} Confirmar pagamento</button>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ modalUnlink }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(13,17,23,.5);z-index:80;display:flex;align-items:center;justify-content:center;padding:24px;animation:athFade .15s;" onClick="{{ closeModal }}">
+  <div onClick="{{ stop }}" style="background:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:32px;max-width:420px;width:100%;animation:athUp .2s;">
+    <div style="width:56px;height:56px;border-radius:9999px;background:rgba(239,68,68,.1);display:flex;align-items:center;justify-content:center;color:#EF4444;margin-bottom:18px;">{{ ic.unlink }}</div>
+    <div style="font:700 20px Inter;letter-spacing:-.3px;margin-bottom:8px;">Desvincular {{ unlinkName }}?</div>
+    <div style="font:400 14px Inter;color:#4B5563;line-height:1.5;margin-bottom:24px;">Você perderá o acesso aos dashboards e ao histórico desta empresa. Os dados já enviados permanecem com a empresa.</div>
+    <div style="display:flex;gap:10px;">
+      <button onClick="{{ closeModal }}" style="flex:1;background:transparent;border:1.5px solid #E8ECF4;color:#4B5563;border-radius:10px;padding:13px;font:600 13px Inter;cursor:pointer;">Cancelar</button>
+      <button onClick="{{ confirmUnlink }}" style="flex:1;background:#EF4444;border:none;color:#fff;border-radius:10px;padding:13px;font:600 13px Inter;cursor:pointer;">Desvincular</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ modalLeave }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(13,17,23,.5);z-index:80;display:flex;align-items:center;justify-content:center;padding:24px;animation:athFade .15s;" onClick="{{ closeModal }}">
+  <div onClick="{{ stop }}" style="background:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:32px;max-width:400px;width:100%;animation:athUp .2s;">
+    <div style="font:700 20px Inter;letter-spacing:-.3px;margin-bottom:8px;">Seu progresso foi salvo</div>
+    <div style="font:400 14px Inter;color:#4B5563;line-height:1.5;margin-bottom:24px;">Deseja sair do formulário e voltar para o catálogo de temas?</div>
+    <div style="display:flex;gap:10px;">
+      <button onClick="{{ closeModal }}" style="flex:1;background:transparent;border:1.5px solid #E8ECF4;color:#4B5563;border-radius:10px;padding:13px;font:600 13px Inter;cursor:pointer;">Continuar</button>
+      <button onClick="{{ leaveFormConfirm }}" style="flex:1;background:#1B4DFF;border:none;color:#fff;border-radius:10px;padding:13px;font:600 13px Inter;cursor:pointer;">Sair</button>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<!-- ===================== TOAST ===================== -->
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:90;background:#0D1117;color:#fff;border-radius:12px;padding:14px 20px;box-shadow:0 8px 24px rgba(0,0,0,.2);display:flex;align-items:center;gap:11px;font:500 14px Inter;animation:athToast .25s ease;max-width:90vw;">
+  <span style="color:#4DFFD2;display:flex;">{{ ic.check }}</span>{{ toast }}
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:860},&quot;startView&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;landing&quot;,&quot;catalog&quot;,&quot;login&quot;,&quot;cadastro&quot;,&quot;dashboard&quot;,&quot;planos&quot;,&quot;cclientes&quot;],&quot;default&quot;:&quot;landing&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;companyName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Nimbus Tecnologia&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;consultancyName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Vértice RH&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = {
+    route: (this.props && this.props.startView) || 'landing',
+    credits: 15,
+    plan: null,
+    answered: [1, 9, 12, 13],
+    accessed: [],
+    filter: 'Todos os temas',
+    menuOpen: false,
+    history: [
+      { date: '16/06/2026', desc: 'Consulta: Reembolso de Km', delta: '\u22123', kind: 'out' },
+      { date: '14/06/2026', desc: 'Resposta: Reembolso de Km', delta: '+5', kind: 'in' },
+      { date: '12/06/2026', desc: 'Cadastro da empresa', delta: '+10', kind: 'in' }
+    ],
+    cadType: 'empresa',
+    form: { reembolsa: true, valor: '1,20', nivel: 'igual', freq: 'Semestral', indices: ['IPCA'], reajuste: '8', pedagio: true, teto: '1.500', satisfacao: 72 },
+    formGroup: 1,
+    dfSeg: 'Todos', dfPorte: 'Todos', dfRegiao: 'Todos',
+    modal: null, unlinkTarget: null, checkout: null, toast: null,
+    iconsReady: false,
+    clients: [
+      { name: 'Nimbus Tecnologia', cnpj: '12.345.678/0001-90', seg: 'Tecnologia', porte: '101\u2013500', regiao: 'Sudeste', credits: 15, status: 'Vinculada', answered: 1, menu: false },
+      { name: 'Aurora Ind\u00fastria', cnpj: '98.765.432/0001-21', seg: 'Ind\u00fastria', porte: '501\u20132.000', regiao: 'Sul', credits: 2, status: 'Vinculada', answered: 3, menu: false },
+      { name: 'Lumen Varejo', cnpj: '45.111.222/0001-33', seg: 'Varejo', porte: 'Acima de 2.000', regiao: 'Nordeste', credits: 0, status: 'Convite pendente', answered: 0, menu: false }
+    ],
+    selectedForms: [12, 9, 1],
+    envioClient: 0,
+    clientMenu: null,
+    formPublic: false,
+    respDone: [9],
+    navStack: [],
+    sidebarCollapsed: false
+  };
+
+  componentDidMount() { this.tryLucide(0); try { if (localStorage.getItem('athon_sb') === '1') this.setState({ sidebarCollapsed: true }); } catch (e) {} }
+  tryLucide(n) {
+    if (window.lucide) { this.setState({ iconsReady: true }); return; }
+    if (n > 60) return;
+    setTimeout(() => this.tryLucide(n + 1), 80);
+  }
+
+  icon(name, size, color, sw) {
+    const L = window.lucide; if (!L) return null;
+    size = size || 24; color = color || 'currentColor'; sw = sw || 2;
+    const toP = s => s.split(/[-_]/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
+    const alias = { 'house': ['Home'], 'more-vertical': ['EllipsisVertical', 'MoreVertical'], 'alert-triangle': ['TriangleAlert'], 'check-big': ['CircleCheckBig', 'CheckCircle2', 'CheckCircle'], 'users-cog': ['UsersRound', 'Users'], 'sliders': ['SlidersHorizontal'], 'repeat': ['Repeat', 'ArrowLeftRight'], 'shield-check': ['ShieldCheck'], 'bar-chart': ['BarChart3'], 'arrow-right': ['ArrowRight'], 'log-out': ['LogOut'], 'building': ['Building2', 'Building'], 'pencil': ['Pencil', 'PencilLine'], 'unlink': ['Unlink', 'Link2Off'] };
+    const cands = [toP(name)];
+    if (alias[name]) cands.push(...alias[name]);
+    let node = null;
+    for (const c of cands) { node = (L.icons && L.icons[c]) || L[c]; if (node) break; }
+    if (!node) return null;
+    let kids = Array.isArray(node) ? node : (node.iconNode || node.default);
+    if (!Array.isArray(kids)) return null;
+    const els = kids.map((c, i) => React.createElement(c[0], Object.assign({ key: i }, c[1])));
+    return React.createElement('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: color, strokeWidth: sw, strokeLinecap: 'round', strokeLinejoin: 'round' }, els);
+  }
+
+  go(route) { this.setState(s => ({ navStack: (s.route && s.route !== route) ? [...s.navStack, s.route] : s.navStack, route, menuOpen: false, modal: null, clientMenu: null })); window.scrollTo(0, 0); }
+  back() { this.setState(s => { const ns = s.navStack.slice(); const prev = ns.pop(); return { navStack: ns, route: prev || 'landing', menuOpen: false, modal: null, clientMenu: null, formPublic: prev === 'form' ? s.formPublic : false }; }); window.scrollTo(0, 0); }
+  toast(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 3200); }
+
+  themeDefs() {
+    return [
+      { id: 1, title: 'Benef\u00edcios \u2014 Al\u00e9m do Tradicional', category: 'Benef\u00edcios', icon: 'gift', dataKey: '% de empresas que oferecem cada benef\u00edcio n\u00e3o-obrigat\u00f3rio e custo m\u00e9dio mensal', n: 312 },
+      { id: 2, title: 'Carreira Y, W, Squad e Outros Modelos', category: 'Cultura e Carreira', icon: 'git-branch', dataKey: 'Modelo de estrutura vigente e % que adotam trilhas t\u00e9cnicas vs. gest\u00e3o', n: 148 },
+      { id: 3, title: 'Deflatores \u2014 Varia\u00e7\u00f5es Salariais por Regi\u00e3o', category: 'Remunera\u00e7\u00e3o', icon: 'map', dataKey: '% de varia\u00e7\u00e3o salarial por regi\u00e3o no \u00faltimo ciclo', n: 201 },
+      { id: 4, title: 'Incentivos de Curto e Longo Prazo', category: 'Remunera\u00e7\u00e3o', icon: 'trending-up', dataKey: '% do sal\u00e1rio-base como b\u00f4nus e tipo de ILP mais adotado', n: 176 },
+      { id: 5, title: 'Gest\u00e3o do P\u00fablico Operacional', category: 'Operacional', icon: 'factory', dataKey: 'Pr\u00e1ticas de controle de ponto, banco de horas e vari\u00e1vel', n: 97 },
+      { id: 6, title: 'Home Office e Hor\u00e1rio Flex\u00edvel', category: 'Cultura e Carreira', icon: 'house', dataKey: 'Modelo predominante e % de aux\u00edlio home office concedido', n: 421 },
+      { id: 7, title: 'Indicadores de RH', category: 'Estrutura', icon: 'bar-chart', dataKey: 'Turnover volunt\u00e1rio, absente\u00edsmo e span of control', n: 265 },
+      { id: 8, title: 'Or\u00e7amento de RH', category: 'Estrutura', icon: 'wallet', dataKey: '% da folha investido em RH e T&D per capita', n: 139 },
+      { id: 9, title: 'Pol\u00edticas de Remunera\u00e7\u00e3o', category: 'Remunera\u00e7\u00e3o', icon: 'scale', dataKey: 'Frequ\u00eancia de revis\u00e3o, crit\u00e9rio principal e % m\u00e9dio de reajuste', n: 288 },
+      { id: 10, title: 'Gest\u00e3o da \u00c1rea Comercial', category: 'Operacional', icon: 'handshake', dataKey: 'Estrutura de comissionamento, gatilho de pagamento e aceleradores', n: 112 },
+      { id: 11, title: 'Estagi\u00e1rios e Trainees', category: 'Cultura e Carreira', icon: 'graduation-cap', dataKey: 'Valor da bolsa por n\u00edvel e % de efetiva\u00e7\u00e3o', n: 154 },
+      { id: 12, title: 'Reembolso de Km', category: 'Operacional', icon: 'car', dataKey: 'Valor do reembolso por km rodado (R$/km) por porte e setor', n: 147 },
+      { id: 13, title: 'Concess\u00e3o de Ve\u00edculos', category: 'Benef\u00edcios', icon: 'truck', dataKey: '% ou valor de reajuste do ve\u00edculo concedido e mix de categorias', n: 88 },
+      { id: 14, title: 'Despesas de Viagens', category: 'Operacional', icon: 'plane', dataKey: 'Valor de di\u00e1ria por destino e limite de categoria hoteleira por n\u00edvel', n: 133 },
+      { id: 15, title: 'Diversidade e Transpar\u00eancia Salarial', category: 'Diversidade', icon: 'users', dataKey: '% de mulheres e negros em lideran\u00e7a e gap salarial por g\u00eanero', n: 176 },
+      { id: 16, title: 'Estruturas Organizacionais', category: 'Estrutura', icon: 'network', dataKey: 'N\u00famero m\u00e9dio de n\u00edveis hier\u00e1rquicos e amplitude de controle', n: 121 },
+      { id: 17, title: 'Remunera\u00e7\u00e3o Executiva', category: 'Remunera\u00e7\u00e3o', icon: 'briefcase', dataKey: 'Mix de remunera\u00e7\u00e3o total por n\u00edvel (C-level, VP, Diretor)', n: 64 },
+      { id: 18, title: 'Engenheiros', category: 'Remunera\u00e7\u00e3o', icon: 'code', dataKey: 'Faixa salarial por senioridade e % com remunera\u00e7\u00e3o vari\u00e1vel', n: 203 },
+      { id: 19, title: 'PJ, Expatriados e Estatut\u00e1rios', category: 'Remunera\u00e7\u00e3o', icon: 'globe', dataKey: 'M\u00faltiplo sobre CLT para PJ e pacote de expatriados', n: 71 },
+      { id: 20, title: 'Treinamento e Desenvolvimento', category: 'Cultura e Carreira', icon: 'book-open', dataKey: 'Horas de treinamento per capita/ano e modalidades', n: 198 },
+      { id: 21, title: 'Benef\u00edcios Flex\u00edveis', category: 'Benef\u00edcios', icon: 'shuffle', dataKey: '% de ades\u00e3o ao modelo flex e cr\u00e9dito mensal m\u00e9dio por colaborador', n: 142 },
+      { id: 22, title: 'Transfer\u00eancia de Colaboradores', category: 'Benef\u00edcios', icon: 'package', dataKey: '% que concedem aux\u00edlio de transfer\u00eancia e valor m\u00e9dio do pacote', n: 53 }
+    ];
+  }
+
+  answerCurrent() {
+    const s = this.state;
+    const ans = s.answered.includes(12) ? s.answered : [...s.answered, 12];
+    const hist = [{ date: '16/06/2026', desc: 'Resposta: Reembolso de Km', delta: '+5', kind: 'in' }, ...s.history];
+    this.setState({ answered: ans, credits: s.credits + 5, history: hist, route: 'sucesso', formGroup: 1, navStack: [...s.navStack, s.route] });
+    window.scrollTo(0, 0);
+  }
+
+  viewBenchmark(id) {
+    const st = this.state;
+    if (st.plan === 'anual' || st.accessed.includes(id)) { this.go('dashboard'); return; }
+    if (st.credits >= 3) {
+      const hist = [{ date: '16/06/2026', desc: 'Consulta: Reembolso de Km', delta: '\u22123', kind: 'out' }, ...st.history];
+      this.setState({ credits: st.credits - 3, accessed: [...st.accessed, id], history: hist, route: 'dashboard', menuOpen: false, navStack: [...st.navStack, st.route] });
+      window.scrollTo(0, 0);
+    } else {
+      this.setState({ modal: 'insufficient', menuOpen: false });
+    }
+  }
+
+  buy(plan) {
+    let desc, planName, price;
+    if (plan === 'pacote') { desc = '50 cr\u00e9ditos adicionados \u00e0 sua conta, sem expira\u00e7\u00e3o.'; planName = 'Pacote 50 cr\u00e9ditos'; price = 'R$ 500'; }
+    else { desc = 'Acesso ilimitado a todos os temas e dashboards por 12 meses.'; planName = 'Assinatura Anual'; price = 'R$ 3.000/ano'; }
+    this.setState({ modal: 'checkout', checkout: { plan, desc, planName, price } });
+  }
+  confirmCheckout() {
+    const c = this.state.checkout;
+    if (c.plan === 'pacote') { this.setState({ credits: this.state.credits + 50, modal: null }); this.toast('Compra confirmada! +50 cr\u00e9ditos adicionados.'); }
+    else { this.setState({ plan: 'anual', modal: null }); this.toast('Assinatura Anual ativada! Acesso ilimitado liberado.'); }
+  }
+
+  renderVals() {
+    const st = this.state;
+    const P = this.props || {};
+    const r = st.route;
+    const ic = {};
+    ['coins', 'coinsbig', 'chevrondown', 'shieldcheck', 'wallet', 'userscog', 'repeat', 'logout', 'layers', 'check', 'checksm', 'checkbig', 'building', 'pencil', 'barchart', 'info', 'save', 'warn', 'arrowright', 'sliders', 'x', 'lock', 'unlink', 'search', 'plus', 'send', 'filetext', 'morev', 'arrowleft', 'clock', 'mail'].forEach(k => {});
+    const I = (n, s, c, w) => this.icon(n, s, c, w);
+    const ico = {
+      coins: I('coins', 18), coinsbig: I('coins', 28, '#4DFFD2'), chevrondown: I('chevron-down', 16, '#9CA3AF'),
+      shieldcheck: I('shield-check', 16), wallet: I('wallet', 17), userscog: I('users', 17), repeat: I('repeat', 17),
+      logout: I('log-out', 17), layers: I('layers', 22), check: I('check', 18), checksm: I('check', 13, '#fff', 3),
+      checkbig: I('check-big', 40, '#10B981'), building: I('building', 22), pencil: I('pencil', 16), barchart: I('bar-chart', 16),
+      info: I('info', 18), save: I('save', 13), warn: I('alert-triangle', 22), arrowright: I('arrow-right', 16, '#fff'),
+      sliders: I('sliders', 16, '#1B4DFF'), x: I('x', 18), lock: I('lock', 16, '#fff'), unlink: I('unlink', 26),
+      search: I('search', 16, '#9CA3AF'), plus: I('plus', 16, '#fff'), send: I('send', 16, '#fff'),
+      filetext: I('file-text', 18, '#1B4DFF'), morev: I('more-vertical', 18, '#4B5563'), arrowleft: I('arrow-left', 16),
+      clock: I('clock', 13, '#F59E0B'), mail: I('mail', 16),
+      barchartdark: I('bar-chart', 17, '#0D1117'), barchartgray: I('bar-chart', 17, '#9CA3AF'),
+      send2: I('send', 16, '#0D1117'), mail2: I('mail', 16, '#0D1117'), unlinksm: I('unlink', 16, '#EF4444'),
+      checkgreen: I('check', 16, '#10B981'),
+      arrowright2: I('arrow-right', 16, '#0A1F6E'), buildingbig: I('building', 26, '#1B4DFF'), usersbig: I('users', 26, '#0A1F6E'),
+      home: I('house', 18, '#4B5563'), arrowleftdark: I('arrow-left', 16, '#0A1F6E'), repeatsm: I('repeat', 17, '#4B5563')
+    };
+
+    // credit color
+    let creditColor = '#0A1F6E';
+    if (st.credits === 0) creditColor = '#EF4444'; else if (st.credits < 10) creditColor = '#F59E0B';
+    const planActive = st.plan === 'anual' || st.plan === 'whitelabel';
+
+    // categories
+    const cats = ['Todos os temas', 'Remunera\u00e7\u00e3o', 'Benef\u00edcios', 'Cultura e Carreira', 'Estrutura', 'Diversidade', 'Operacional'];
+    const categories = cats.map(label => {
+      const active = st.filter === label;
+      return { label, bg: active ? '#1B4DFF' : '#fff', color: active ? '#fff' : '#4B5563', border: active ? '#1B4DFF' : '#E8ECF4', onClick: () => this.setState({ filter: label }) };
+    });
+
+    // themes
+    const defs = this.themeDefs();
+    const filtered = st.filter === 'Todos os temas' ? defs : defs.filter(d => d.category === st.filter);
+    const themes = filtered.map(d => {
+      const answered = st.answered.includes(d.id);
+      const accessed = st.accessed.includes(d.id);
+      const ctaResponder = !answered;
+      const ctaVerGhost = answered && (accessed || planActive);
+      const ctaVerPrimary = answered && !ctaVerGhost;
+      return {
+        id: d.id, title: d.title, category: d.category, dataKey: d.dataKey, n: d.n,
+        iconEl: I(d.icon, 24, '#1B4DFF'),
+        answered, notAnswered: !answered, ctaResponder, ctaVerPrimary, ctaVerGhost,
+        onRespond: () => this.go('form'),
+        onBenchmark: () => this.viewBenchmark(d.id)
+      };
+    });
+
+    // form helpers
+    const f = st.form;
+    const groupTitles = { 1: 'Pol\u00edtica de Reembolso', 2: 'Crit\u00e9rios e Reajuste', 3: 'Cobertura' };
+    const indiceOpts = ['IPCA', 'Pre\u00e7o do combust\u00edvel', 'Tabela FIPE', 'Decis\u00e3o interna', 'Outro'];
+    const indiceChips = indiceOpts.map(label => {
+      const on = f.indices.includes(label);
+      return {
+        label, bg: on ? '#1B4DFF' : '#fff', color: on ? '#fff' : '#4B5563', border: on ? '#1B4DFF' : '#E8ECF4',
+        onClick: () => { const arr = on ? f.indices.filter(x => x !== label) : [...f.indices, label]; this.setState({ form: Object.assign({}, f, { indices: arr }) }); }
+      };
+    });
+    const reajusteNum = parseFloat(String(f.reajuste).replace(',', '.'));
+    const setF = (k, v) => this.setState({ form: Object.assign({}, f, { [k]: v }) });
+
+    // dashboard
+    const dashInsufficient = st.dfSeg !== 'Todos' && st.dfPorte !== 'Todos' && st.dfRegiao !== 'Todos';
+    const histo = [
+      { label: 'R$0,70\u20130,90', pct: 12 }, { label: 'R$0,90\u20131,10', pct: 28 }, { label: 'R$1,10\u20131,30', pct: 34 }, { label: 'R$1,30\u20131,50', pct: 18 }, { label: 'R$1,50+', pct: 8 }
+    ].map(x => ({ label: x.label, pct: x.pct, h: (x.pct / 34 * 170) + 'px', color: x.pct === 34 ? '#1B4DFF' : '#93C5FD' }));
+    const segRaw = [['Tecnologia', 1.25], ['Ind\u00fastria', 1.32], ['Varejo', 1.02], ['Servi\u00e7os', 1.10], ['Sa\u00fade', 1.18], ['Financeiro', 1.40]];
+    const segmentos = segRaw.map(s => ({ label: s[0], val: s[1].toFixed(2).replace('.', ','), w: (s[1] / 1.5 * 100) + '%' }));
+
+    // trend chart (svg)
+    const tpts = [['24-S1', 1.02], ['24-S2', 1.08], ['25-S1', 1.12], ['25-S2', 1.15]];
+    const W = 560, H = 180, padX = 40, padY = 26;
+    const minV = 0.95, maxV = 1.20;
+    const xAt = i => padX + i * ((W - padX * 2) / (tpts.length - 1));
+    const yAt = v => padY + (1 - (v - minV) / (maxV - minV)) * (H - padY * 2);
+    const linePts = tpts.map((p, i) => xAt(i) + ',' + yAt(p[1])).join(' ');
+    const areaPts = 'M' + tpts.map((p, i) => xAt(i) + ',' + yAt(p[1])).join(' L') + ' L' + xAt(tpts.length - 1) + ',' + (H - padY) + ' L' + xAt(0) + ',' + (H - padY) + ' Z';
+    const trendChart = React.createElement('svg', { viewBox: '0 0 ' + W + ' ' + H, style: { width: '100%', height: 'auto', maxHeight: '220px' } }, [
+      React.createElement('path', { key: 'a', d: areaPts, fill: 'rgba(27,77,255,0.08)' }),
+      React.createElement('polyline', { key: 'l', points: linePts, fill: 'none', stroke: '#1B4DFF', strokeWidth: 2.5, strokeLinecap: 'round', strokeLinejoin: 'round' }),
+      ...tpts.map((p, i) => React.createElement('circle', { key: 'c' + i, cx: xAt(i), cy: yAt(p[1]), r: 5, fill: '#fff', stroke: '#1B4DFF', strokeWidth: 2.5 })),
+      ...tpts.map((p, i) => React.createElement('text', { key: 'v' + i, x: xAt(i), y: yAt(p[1]) - 14, textAnchor: 'middle', fill: '#0A1F6E', style: { font: "600 12px 'JetBrains Mono',monospace" } }, 'R$ ' + p[1].toFixed(2).replace('.', ','))),
+      ...tpts.map((p, i) => React.createElement('text', { key: 't' + i, x: xAt(i), y: H - 6, textAnchor: 'middle', fill: '#9CA3AF', style: { font: '400 11px Inter' } }, p[0]))
+    ]);
+
+    // plans
+    const history = st.history.slice(0, 3).map(h => ({ desc: h.desc, date: h.date, delta: h.delta, color: h.kind === 'in' ? '#4DFFD2' : '#fca5a5' }));
+    const usoCreditos = [
+      { acao: 'Cadastro da empresa', cr: '+10', color: '#10B981', obs: '\u00danico, no cadastro' },
+      { acao: 'Preencher formul\u00e1rio', cr: '+5', color: '#10B981', obs: 'Por tema, a cada 6 meses' },
+      { acao: 'Consultar dashboard', cr: '\u22123', color: '#EF4444', obs: 'Apenas na 1\u00aa consulta' },
+      { acao: 'Consulta subsequente', cr: '0', color: '#9CA3AF', obs: 'Gratuita ap\u00f3s a 1\u00aa' }
+    ];
+
+    // cadastro
+    const benefits = [
+      { text: 'Dados de mercado em tempo real', iconEl: I('activity', 20, '#4DFFD2') },
+      { text: 'Formul\u00e1rios r\u00e1pidos de 5 a 10 minutos', iconEl: I('clock', 20, '#4DFFD2') },
+      { text: st.cadType === 'consultor' ? 'Gerencie quantas empresas-cliente quiser' : '10 cr\u00e9ditos gratuitos ao cadastrar', iconEl: I(st.cadType === 'consultor' ? 'users' : 'coins', 20, '#4DFFD2') }
+    ];
+
+    // consultor: client cards
+    const clientCards = st.clients.map((c, i) => {
+      const isPending = c.status === 'Convite pendente';
+      const isUnlinked = c.status === 'Desvinculada';
+      const canDash = c.status === 'Vinculada' && c.credits >= 3;
+      const dashBlocked = c.status === 'Vinculada' && c.credits < 3;
+      let statusBg = 'rgba(16,185,129,.12)', statusColor = '#0a7a55', statusDot = '#10B981';
+      if (isPending) { statusBg = 'rgba(245,158,11,.14)'; statusColor = '#b45309'; statusDot = '#F59E0B'; }
+      if (isUnlinked) { statusBg = '#E8ECF4'; statusColor = '#4B5563'; statusDot = '#9CA3AF'; }
+      return {
+        name: c.name, cnpj: c.cnpj, seg: c.seg, porte: c.porte, regiao: c.regiao, credits: c.credits,
+        answered: c.answered, progressW: (c.answered / 22 * 100) + '%', status: c.status,
+        statusBg, statusColor, statusDot,
+        creditBg: c.credits < 3 ? 'rgba(245,158,11,.14)' : '#F4F6FB', creditColor: c.credits < 3 ? '#b45309' : '#0A1F6E',
+        opacity: isPending || isUnlinked ? '0.72' : '1',
+        isPending, notPending: !isPending && !isUnlinked, canDash, dashBlocked,
+        menuOpen: st.clientMenu === i,
+        onMenu: e => { e.stopPropagation(); this.setState({ clientMenu: st.clientMenu === i ? null : i }); },
+        onVerDash: () => {
+          if (canDash) { const cl = st.clients.slice(); cl[i] = Object.assign({}, cl[i], { credits: cl[i].credits - 3 }); this.setState({ clients: cl, clientMenu: null }); this.go('dashboard'); this.toast('Dashboard aberto · 3 créditos debitados de ' + c.name); }
+          else { this.setState({ clientMenu: null }); this.toast('Esta empresa não possui créditos suficientes. Apenas a própria empresa pode adquirir créditos.'); }
+        },
+        onEnviar: () => { this.setState({ envioClient: i, clientMenu: null }); this.go('cenvio'); },
+        onReenviar: () => { this.setState({ clientMenu: null }); this.toast('Convite reenviado para ' + c.name); },
+        onDesvincular: () => this.setState({ modal: 'unlink', clientMenu: null, unlinkTarget: { kind: 'consultor', name: c.name, index: i } })
+      };
+    });
+    const countVinculadas = st.clients.filter(c => c.status === 'Vinculada').length;
+    const countPendentes = st.clients.filter(c => c.status === 'Convite pendente').length;
+
+    // consultor: envio themes
+    const envioThemes = defs.map(d => {
+      const checked = st.selectedForms.includes(d.id);
+      return {
+        title: d.title, category: d.category, iconEl: I(d.icon, 20, '#1B4DFF'),
+        respondido: d.id === 9, checked,
+        border: checked ? '#1B4DFF' : '#E8ECF4', boxBg: checked ? '#1B4DFF' : '#fff', boxBorder: checked ? '#1B4DFF' : '#9CA3AF',
+        checkEl: checked ? I('check', 14, '#fff', 3) : null,
+        onToggle: () => { const arr = checked ? st.selectedForms.filter(x => x !== d.id) : [...st.selectedForms, d.id]; this.setState({ selectedForms: arr }); }
+      };
+    });
+
+    // responder: public form list
+    const respForms = st.selectedForms.map(id => defs.find(d => d.id === id)).filter(Boolean).map(d => {
+      const done = st.respDone.includes(d.id);
+      return {
+        title: d.title, iconEl: I(d.icon, 22, '#1B4DFF'), done, notDone: !done,
+        onRespond: () => { this.setState({ formPublic: true, route: 'form', formGroup: 1, respCurrent: d.id, navStack: [...st.navStack, st.route] }); window.scrollTo(0, 0); }
+      };
+    });
+    const respTotal = st.selectedForms.length;
+    const respDoneCount = st.selectedForms.filter(id => st.respDone.includes(id)).length;
+
+    // sidebar navigation
+    const consultorArea = ['cclientes', 'cnovo', 'cenvio'].includes(r);
+    const navDefs = consultorArea
+      ? [{ key: 'cclientes', label: 'Empresas-cliente', icon: 'building', active: true }]
+      : [
+          { key: 'catalog', label: 'Temas de benchmark', icon: 'layers', active: ['catalog', 'form', 'sucesso', 'dashboard'].includes(r) && !st.formPublic },
+          { key: 'planos', label: 'Créditos e planos', icon: 'wallet', active: r === 'planos' },
+          { key: 'consultores', label: 'Consultores', icon: 'users', active: r === 'consultores' }
+        ];
+    const navItems = navDefs.map(d => ({
+      label: d.label, active: d.active,
+      iconEl: I(d.icon, 19, d.active ? '#1B4DFF' : '#4B5563'),
+      bg: d.active ? 'rgba(27,77,255,.08)' : 'transparent',
+      color: d.active ? '#1B4DFF' : '#4B5563', weight: d.active ? '600' : '500',
+      onClick: () => this.go(d.key)
+    }));
+    const showSidebar = ['catalog', 'form', 'sucesso', 'dashboard', 'planos', 'consultores', 'cclientes', 'cnovo', 'cenvio'].includes(r) && !st.formPublic;
+    const sbCol = st.sidebarCollapsed;
+
+    return {
+      // routing flags
+      isCClientes: r === 'cclientes', isCNovo: r === 'cnovo', isCEnvio: r === 'cenvio',
+      isAceite: r === 'aceite', isRespList: r === 'resplist', isLanding: r === 'landing',
+      formCorp: !st.formPublic, formPublic: st.formPublic,
+      isCatalog: r === 'catalog', isForm: r === 'form', isSucesso: r === 'sucesso', isDashboard: r === 'dashboard',
+      isLogin: r === 'login', isCadastro: r === 'cadastro', isPlanos: r === 'planos', isConsultores: r === 'consultores',
+      showAppTopbar: ['catalog', 'sucesso', 'dashboard', 'planos', 'consultores'].includes(r),
+      showConsultorTopbar: ['cclientes', 'cnovo', 'cenvio'].includes(r),
+      showCreditBadge: !planActive,
+      menuOpen: st.menuOpen,
+      ic: ico,
+      companyName: P.companyName || 'Nimbus Tecnologia',
+      consultancyName: P.consultancyName || 'V\u00e9rtice RH',
+      credits: st.credits, creditColor, planActive,
+      // catalog
+      answeredCount: st.answered.length, categories, themes,
+      // form
+      formGroup: st.formGroup, groupTitle: groupTitles[st.formGroup], formProgress: (st.formGroup / 3 * 100) + '%',
+      group1: st.formGroup === 1, group2: st.formGroup === 2, group3: st.formGroup === 3,
+      groupGt1: st.formGroup > 1, groupLt3: st.formGroup < 3,
+      form: f, indiceChips, reajusteWarn: !isNaN(reajusteNum) && reajusteNum > 100,
+      reembolsaSimBg: f.reembolsa ? 'rgba(27,77,255,.08)' : '#fff', reembolsaSimBorder: f.reembolsa ? '#1B4DFF' : '#E8ECF4', reembolsaSimColor: f.reembolsa ? '#1B4DFF' : '#4B5563',
+      reembolsaNaoBg: !f.reembolsa ? 'rgba(27,77,255,.08)' : '#fff', reembolsaNaoBorder: !f.reembolsa ? '#1B4DFF' : '#E8ECF4', reembolsaNaoColor: !f.reembolsa ? '#1B4DFF' : '#4B5563',
+      nivelIgualBorder: f.nivel === 'igual' ? '#1B4DFF' : '#E8ECF4', nivelIgualBg: f.nivel === 'igual' ? 'rgba(27,77,255,.05)' : '#fff', nivelIgualDot: f.nivel === 'igual' ? '#1B4DFF' : '#9CA3AF', nivelIgualFill: f.nivel === 'igual' ? '#1B4DFF' : 'transparent',
+      nivelVariaBorder: f.nivel === 'varia' ? '#1B4DFF' : '#E8ECF4', nivelVariaBg: f.nivel === 'varia' ? 'rgba(27,77,255,.05)' : '#fff', nivelVariaDot: f.nivel === 'varia' ? '#1B4DFF' : '#9CA3AF', nivelVariaFill: f.nivel === 'varia' ? '#1B4DFF' : 'transparent',
+      pedagioBg: f.pedagio ? '#1B4DFF' : '#E8ECF4', pedagioPos: f.pedagio ? '23px' : '3px',
+      setReembolsaSim: () => setF('reembolsa', true), setReembolsaNao: () => setF('reembolsa', false),
+      setNivelIgual: () => setF('nivel', 'igual'), setNivelVaria: () => setF('nivel', 'varia'),
+      onValor: e => setF('valor', e.target.value), onFreq: e => setF('freq', e.target.value), onReajuste: e => setF('reajuste', e.target.value),
+      onTeto: e => setF('teto', e.target.value), onSatisfacao: e => setF('satisfacao', e.target.value), togglePedagio: () => setF('pedagio', !f.pedagio),
+      nextGroup: () => { this.setState({ formGroup: Math.min(3, st.formGroup + 1) }); window.scrollTo(0, 0); },
+      prevGroup: () => { this.setState({ formGroup: Math.max(1, st.formGroup - 1) }); window.scrollTo(0, 0); },
+      submitForm: () => {
+        if (st.formPublic) {
+          const id = st.respCurrent;
+          const rd = st.respDone.includes(id) ? st.respDone : [...st.respDone, id];
+          this.setState({ respDone: rd, formPublic: false, route: 'resplist', formGroup: 1, navStack: [...st.navStack, st.route] });
+          this.toast('Resposta enviada! +5 créditos para a empresa.'); window.scrollTo(0, 0);
+        } else { this.answerCurrent(); }
+      },
+      goRespList: () => { this.setState({ route: 'resplist', formPublic: false, formGroup: 1 }); window.scrollTo(0, 0); },
+      confirmLeaveForm: () => this.setState({ modal: 'leave' }),
+      // sucesso
+      canBenchmarkAfter: st.credits >= 3 || planActive, cantBenchmarkAfter: !(st.credits >= 3 || planActive),
+      benchmarkFromSucesso: () => this.viewBenchmark(12),
+      // dashboard
+      dfSeg: st.dfSeg, dfPorte: st.dfPorte, dfRegiao: st.dfRegiao,
+      onDfSeg: e => this.setState({ dfSeg: e.target.value }), onDfPorte: e => this.setState({ dfPorte: e.target.value }), onDfRegiao: e => this.setState({ dfRegiao: e.target.value }),
+      dashInsufficient, dashSufficient: !dashInsufficient, suaPosicao: st.answered.includes(12),
+      histo, segmentos, trendChart,
+      // plans
+      history, usoCreditos,
+      buyPacote: () => this.buy('pacote'), buyAnual: () => this.buy('anual'),
+      contactComercial: () => this.toast('Solicita\u00e7\u00e3o enviada! Nosso time comercial entrar\u00e1 em contato.'),
+      checkoutDesc: st.checkout ? st.checkout.desc : '', checkoutPlan: st.checkout ? st.checkout.planName : '', checkoutPrice: st.checkout ? st.checkout.price : '',
+      confirmCheckout: () => this.confirmCheckout(),
+      // cadastro
+      cadEmpresa: st.cadType === 'empresa', cadConsultor: st.cadType === 'consultor', benefits,
+      setTypeEmpresa: () => this.setState({ cadType: 'empresa' }), setTypeConsultor: () => this.setState({ cadType: 'consultor' }),
+      typeEmpresaBg: st.cadType === 'empresa' ? '#fff' : 'transparent', typeEmpresaColor: st.cadType === 'empresa' ? '#1B4DFF' : '#4B5563', typeEmpresaShadow: st.cadType === 'empresa' ? '0 1px 3px rgba(0,0,0,.1)' : 'none',
+      typeConsultorBg: st.cadType === 'consultor' ? '#fff' : 'transparent', typeConsultorColor: st.cadType === 'consultor' ? '#1B4DFF' : '#4B5563', typeConsultorShadow: st.cadType === 'consultor' ? '0 1px 3px rgba(0,0,0,.1)' : 'none',
+      submitCadastroEmpresa: () => { this.setState({ credits: 10, answered: [], accessed: [] }); this.toast('Conta criada! Voc\u00ea ganhou 10 cr\u00e9ditos de boas-vindas.'); this.go('catalog'); },
+      submitCadastroConsultor: () => { this.toast('Conta de consultor criada!'); this.go('cclientes'); },
+      // consultores empresa
+      unlinkConsultorEmpresa: () => this.setState({ modal: 'unlink', unlinkTarget: { kind: 'empresa', name: 'Rafael Lima' } }),
+      // nav
+      goCatalog: () => this.go('catalog'), goPlanos: () => this.go('planos'), goConsultores: () => this.go('consultores'),
+      goLogin: () => this.go('login'), goCadastro: () => this.go('cadastro'), goConsultorPersona: () => this.go('cclientes'),
+      goClientes: () => this.go('cclientes'), goNovo: () => this.go('cnovo'),
+      // sidebar + back
+      showSidebar, navItems, consultorArea, notConsultorArea: !consultorArea,
+      collapsed: sbCol, notCollapsed: !sbCol,
+      sbWidth: sbCol ? '76px' : '248px', sbPad: sbCol ? '20px 12px' : '20px 14px',
+      sbLabel: sbCol ? 'none' : 'inline', sbJustify: sbCol ? 'center' : 'flex-start',
+      sbToggleIcon: I(sbCol ? 'chevrons-right' : 'chevrons-left', 18, '#4B5563'),
+      toggleSidebar: () => { const v = !st.sidebarCollapsed; try { localStorage.setItem('athon_sb', v ? '1' : '0'); } catch (e) {} this.setState({ sidebarCollapsed: v }); },
+      canBack: st.navStack.length > 0, notCanBack: st.navStack.length === 0, doBack: () => this.back(),
+      goLanding: () => this.go('landing'),
+      goSidebarHome: () => this.go(consultorArea ? 'cclientes' : 'catalog'),
+      concluirResponder: () => this.go('cclientes'),
+      // consultor data
+      clientCards, countVinculadas, countPendentes,
+      envioThemes, selectedCount: st.selectedForms.length,
+      respForms, respTotal, respDoneCount, respProgressW: (respTotal ? respDoneCount / respTotal * 100 : 0) + '%',
+      landingThemes: defs.slice(0, 8).map(d => ({ title: d.title, category: d.category, iconEl: I(d.icon, 22, '#1B4DFF') })),
+      enviarConvite: () => this.go('aceite'),
+      enviarFormularios: () => { this.go('resplist'); this.toast('Formulários enviados para contato@nimbus.com.br'); },
+      aceitarConvite: () => { const cl = st.clients.slice(); const li = cl.findIndex(c => c.status === 'Convite pendente'); if (li >= 0) cl[li] = Object.assign({}, cl[li], { status: 'Vinculada', credits: 10 }); this.setState({ clients: cl }); this.go('cclientes'); this.toast('Vínculo aceito! A empresa ganhou +10 créditos de boas-vindas.'); },
+      recusarConvite: () => { this.go('cclientes'); this.toast('Convite recusado.'); },
+      toggleMenu: () => this.setState({ menuOpen: !st.menuOpen }),
+      // modals
+      modalInsufficient: st.modal === 'insufficient', modalCheckout: st.modal === 'checkout', modalUnlink: st.modal === 'unlink', modalLeave: st.modal === 'leave',
+      closeModal: () => this.setState({ modal: null }), stop: e => e.stopPropagation(),
+      goCatalogFromModal: () => this.go('catalog'), goPlanosFromModal: () => this.go('planos'),
+      unlinkName: st.unlinkTarget ? st.unlinkTarget.name : '',
+      confirmUnlink: () => {
+        const t = st.unlinkTarget;
+        if (t && t.kind === 'consultor') { const cl = st.clients.slice(); cl[t.index] = Object.assign({}, cl[t.index], { status: 'Desvinculada' }); this.setState({ clients: cl, modal: null }); }
+        else { this.setState({ modal: null }); }
+        this.toast('Desvinculado com sucesso.');
+      },
+      leaveFormConfirm: () => this.go('catalog'),
+      toast: st.toast,
+      // placeholders (filled in later edits)
+      consultorScreens: null, landingScreen: null
+    };
+  }
+}
+</script>
+</body>
+</html>
